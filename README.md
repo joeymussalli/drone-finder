@@ -50,30 +50,33 @@ An indoor lost-item search system: type what you're looking for and a small quad
 
 ## Sim Demo Photos
 
-Simulation mode serves real photos from the `sim_images/` folder so the
-vision model can actually find something during a demo. Drop your own
-JPGs into `sim_images/`:
+Simulation mode serves real photos from `sim_images/` so the vision model
+actually finds things. The repo ships with a working set already: five
+item photos, three plain room photos, and a `sim_layout.json` manifest
+that pins each item to a fixed cell on the room map.
 
-1. Add **one** photo named `target.jpg` that clearly shows the item you
-   will search for (e.g. a blue water bottle on a table). This is the
-   photo the drone "sees" when it reaches the target cell.
-2. Add **one or more** other room photos with any filename (e.g.
-   `room1.jpg`, `hallway.jpg`, `desk.jpg`). These are shown while the
-   drone sweeps the rest of the area and must NOT contain the item.
-3. Supported extensions: `.jpg`, `.jpeg`, `.png`. Any file named
-   `target.*` is the target; every other image is treated as a
-   non-target room photo.
-4. Set `SIM_TARGET_CELL` in `.env` to the grid cell where the target
-   photo should appear (default `1,2`). The drone must pass through this
-   cell during the sweep for the item to be found.
-5. Search for the item by name in the UI (e.g. `blue water bottle`). The
-   detector runs against whichever photo is being served for the drone's
-   current cell.
+Out of the box you can search for any of these and the drone will find it
+at its spot on the map:
 
-> **Note:** The repo ships with solid-colour placeholder images so the
-> server starts out of the box, but nothing can be detected in them.
-> Replace them with real photos for a working find. You need at least a
-> `target.jpg` plus one other photo.
+- `water bottle` (front-left), `backpack` (front-right), `laptop` (centre),
+  `keys` (back-left), `coffee mug` (back-right).
+
+To customise, edit `sim_images/sim_layout.json`:
+
+1. Add your photo to `sim_images/` (any filename; `.jpg`/`.jpeg`/`.png`).
+2. Add an entry under `items` with its `name`, `file`, `cell` ([col,row]
+   on the grid), and `aliases` (search phrases that should match it).
+3. List plain room photos under `plain`; these fill every non-item cell.
+4. Pick an item name that YOLO-World recognises well (water bottle,
+   backpack, laptop, keys, coffee mug all work) and search that phrase.
+
+The item photo only appears at its cell when the active search matches its
+aliases, so searching "laptop" never false-triggers on the bottle photo.
+Photo credits and licenses are in `sim_images/CREDITS.md`.
+
+> **Legacy mode:** if there is no `sim_layout.json`, the app falls back to a
+> single `target.*` photo served at `SIM_TARGET_CELL`, with other images as
+> plain fillers.
 
 ## Running with Real Hardware
 

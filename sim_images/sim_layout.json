@@ -1,0 +1,11 @@
+{
+  "comment": "Maps each searchable item to its photo and a fixed grid cell (col,row). Grid is 7x7 for the default 3x3 m area at 0.5 m step (cols/rows 0-6). The item photo is served only when the drone is on its cell AND the active search query matches one of the item's aliases; every other cell shows a plain room photo.",
+  "items": [
+    { "name": "water bottle", "file": "item_water_bottle.jpg", "cell": [1, 1], "aliases": ["water bottle", "bottle", "water", "flask"] },
+    { "name": "backpack",     "file": "item_backpack.jpg",     "cell": [5, 1], "aliases": ["backpack", "bag", "rucksack", "knapsack"] },
+    { "name": "laptop",       "file": "item_laptop.jpg",       "cell": [3, 3], "aliases": ["laptop", "computer", "notebook computer"] },
+    { "name": "keys",         "file": "item_keys.jpg",         "cell": [1, 5], "aliases": ["keys", "key", "keychain", "house keys"] },
+    { "name": "coffee mug",   "file": "item_coffee_mug.jpg",   "cell": [5, 5], "aliases": ["coffee mug", "mug", "cup", "coffee", "coffee cup"] }
+  ],
+  "plain": ["plain_room_1.jpg", "plain_room_2.jpg", "plain_room_3.jpg"]
+}

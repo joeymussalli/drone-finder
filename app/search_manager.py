@@ -259,8 +259,18 @@ class SearchManager:
             ))
             return
 
+        # Resolve which item this query maps to (manifest-driven sim) so the
+        # correct photo appears at the correct cell during the sweep.
+        target_cell = None
+        if self._sim_mode:
+            try:
+                self._video_source.set_query(query)
+                cell = self._video_source.active_target_cell
+                target_cell = list(cell) if cell is not None else None
+            except Exception:
+                target_cell = list(self._config.sim_target_cell)
+
         # Tell the UI about the grid up front so it can draw the map.
-        target_cell = list(self._config.sim_target_cell) if self._sim_mode else None
         await self.broadcast(WSMessage(
             type="grid",
             payload={

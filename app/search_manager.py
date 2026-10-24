@@ -432,43 +432,51 @@ class SearchManager:
             await self._drone.turn(move.angle_deg or 0.0)
 
     async def _handle_candidate(self, event: CandidateFoundEvent, query: str) -> bool:
-        """Run the staged confirmation narrative, then confirm via LLM."""
-        # Staged "confirming 1/3 -> 2/3 -> 3/3" indicator for the viewer.
+        """Run the staged confirmation narrative, confirm, then reveal the find."""
+        from app.llm.interface import NullLLMAdapter
+        have_llm = not isinstance(self._llm, NullLLMAdapter)
+
+        # Staged "confirming 1/3 -> 2/3 -> 3/3" indicator, paced so the audience
+        # can read each step.
         for stage in (1, 2, 3):
             await self.broadcast(WSMessage(
                 type="confirming",
                 payload={"stage": stage, "of": 3, "confidence": event.confidence},
             ))
             await self._log(f"Spotted candidate - confirming {stage}/3 (confidence {event.confidence:.2f})")
-            await asyncio.sleep(0.5)
-
-        # "AI confirming..." step.
-        await self.broadcast(WSMessage(type="ai_confirming", payload={"query": query}))
-        await self._log("AI confirming the match...")
+            await asyncio.sleep(0.7)
 
         confirmed = True
         location = ""
-        try:
-            confirmed, location = await asyncio.wait_for(
-                self._llm.confirm(event.best_frame_bytes, query),
-                timeout=self.LLM_TIMEOUT_S,
-            )
-        except (asyncio.TimeoutError, LLMError) as exc:
-            # Demo must still land the story: treat as confirmed with a
-            # sensible fallback location sentence instead of failing.
-            await self._log(f"LLM unavailable ({exc}) - using fallback confirmation.", "error")
-            confirmed = True
-            location = ""
-
-        await self._log(f"AI confirmation: {'YES' if confirmed else 'NO'}")
+        if have_llm:
+            # Real LLM: show the "AI confirming..." step and call it.
+            await self.broadcast(WSMessage(type="ai_confirming", payload={"query": query}))
+            await self._log("AI confirming the match...")
+            try:
+                confirmed, location = await asyncio.wait_for(
+                    self._llm.confirm(event.best_frame_bytes, query),
+                    timeout=self.LLM_TIMEOUT_S,
+                )
+                await self._log(f"AI confirmation: {'YES' if confirmed else 'NO'}")
+            except (asyncio.TimeoutError, LLMError) as exc:
+                # Land the story: fall back to a vision-only confirmation.
+                await self._log(f"AI unavailable ({exc}) - confirmed by vision model.", "error")
+                confirmed = True
+                location = ""
+        else:
+            # No API key: do NOT claim an AI confirmation. The 3-frame vision
+            # window is the confirmation.
+            await self._log("Confirmed by vision model.")
 
         if not confirmed:
             return False
 
         await self._drone.hover(5.0)
 
-        description = location.strip() if location else ""
-        if not description:
+        description = ""
+        if have_llm and location.strip():
+            description = location.strip()
+        elif have_llm:
             try:
                 description = await asyncio.wait_for(
                     self._llm.describe(event.best_frame_bytes, query),
@@ -479,10 +487,20 @@ class SearchManager:
         if not description:
             description = self._fallback_location_sentence(query)
 
-        photo_b64 = base64.b64encode(event.best_frame_bytes).decode()
+        # Draw the detection box on the result photo so the find is obvious.
+        photo_bytes = self._draw_box_on(event.best_frame_bytes, event.bbox)
+        photo_b64 = base64.b64encode(photo_bytes).decode()
         found_cell = list(self._cell)
 
+        # Reveal the pin and pulse on the map FIRST, then after a beat show the
+        # result card (UI places it over the camera side, leaving the map visible).
+        await self.broadcast(WSMessage(
+            type="found_preview",
+            payload={"found_cell": found_cell, "confidence": event.confidence},
+        ))
         await self._log(f"Item found: {description}")
+        await asyncio.sleep(2.0)
+
         await self.broadcast(WSMessage(
             type="result",
             payload={
@@ -494,13 +512,3 @@ class SearchManager:
         ))
         return True
 
-    def _fallback_location_sentence(self, query: str) -> str:
-        """A sensible human-readable location when the LLM is unavailable."""
-        col, row = self._cell
-        # Describe the cell position in plain language for the map region.
-        col_word = "left" if col < self._cols / 3 else ("right" if col > 2 * self._cols / 3 else "centre")
-        row_word = "front" if row < self._rows / 3 else ("back" if row > 2 * self._rows / 3 else "middle")
-        return f"The {query} appears in the {row_word}-{col_word} area of the room."
-
-    def on_candidate_found(self, event: CandidateFoundEvent) -> None:
-        self._candidate_event = event

@@ -7,7 +7,7 @@ from ultralytics import YOLOWorld
 
 from app.models import CandidateFoundEvent, FrameResult
 
-CONFIDENCE_THRESHOLD = 0.7
+CONFIDENCE_THRESHOLD = 0.5
 WINDOW_SIZE = 3
 
 
@@ -16,14 +16,14 @@ class VisionModule:
 
     Call set_query(query) before each search to configure the target class.
     Call analyse_frame(frame, query) for each incoming video frame.
-    When 3 consecutive frames all detect the target with confidence >= 0.7,
+    When 3 consecutive frames all detect the target with confidence >= 0.5,
     emits a CandidateFoundEvent via the provided callback.
     """
 
     def __init__(
         self,
         candidate_callback: Callable[[CandidateFoundEvent], None],
-        model_name: str = "yolov8s-worldv2.pt",
+        model_name: str = "yolov8m-worldv2.pt",
     ) -> None:
         self._callback = candidate_callback
         self._model_name = model_name

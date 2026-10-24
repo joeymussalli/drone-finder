@@ -58,8 +58,9 @@ that pins each item to a fixed cell on the room map.
 Out of the box you can search for any of these and the drone will find it
 at its spot on the map:
 
-- `water bottle` (front-left), `backpack` (front-right), `laptop` (centre),
-  `keys` (back-left), `coffee mug` (back-right).
+- `water bottle`, `backpack`, `coffee mug`, `laptop`, and `cell phone`.
+  Each sits in a different spot (rows 3-6 of the map), so each search runs for
+  a good while before the find.
 
 To customise, edit `sim_images/sim_layout.json`:
 
@@ -68,7 +69,8 @@ To customise, edit `sim_images/sim_layout.json`:
    on the grid), and `aliases` (search phrases that should match it).
 3. List plain room photos under `plain`; these fill every non-item cell.
 4. Pick an item name that YOLO-World recognises well (water bottle,
-   backpack, laptop, keys, coffee mug all work) and search that phrase.
+   backpack, laptop, coffee mug, cell phone all work well) and search it.
+   Detection uses the yolov8m-worldv2 model at a 0.5 confidence threshold.
 
 The item photo only appears at its cell when the active search matches its
 aliases, so searching "laptop" never false-triggers on the bottle photo.

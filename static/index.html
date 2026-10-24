@@ -80,15 +80,15 @@
     .log-line.error { color: #ff8a8a; }
 
     /* result overlay (modal) */
-    #result-overlay { position: fixed; inset: 0; background: rgba(5,9,20,0.82); display: none; align-items: center; justify-content: center; z-index: 50; }
+    #result-overlay { position: absolute; inset: 0; background: rgba(5,9,20,0.88); display: none; align-items: center; justify-content: center; z-index: 20; padding: 0.8rem; }
     #result-overlay.on { display: flex; }
-    #result-card { background: var(--panel); border: 2px solid var(--accent); border-radius: 16px; padding: 1.6rem 2rem; text-align: center; max-width: 620px; max-height: 92vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-    #result-heading { font-size: 2.1rem; font-weight: 800; margin-bottom: 0.9rem; }
+    #result-card { background: var(--panel); border: 2px solid var(--accent); border-radius: 14px; padding: 1rem 1.2rem; text-align: center; max-width: 100%; max-height: 100%; overflow: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+    #result-heading { font-size: 1.7rem; font-weight: 800; margin-bottom: 0.6rem; }
     #result-heading.found { color: var(--accent2); }
     #result-heading.not-found { color: #ff8a8a; }
-    #result-photo { max-width: 100%; max-height: 42vh; border-radius: 10px; margin-bottom: 0.9rem; display: none; border: 3px solid var(--accent2); }
+    #result-photo { max-width: 100%; max-height: 38vh; border-radius: 10px; margin-bottom: 0.7rem; display: none; border: 3px solid var(--accent2); }
     #result-photo.on { display: inline-block; }
-    #result-desc { font-size: 1.3rem; color: #dbe7ff; margin-bottom: 1.1rem; }
+    #result-desc { font-size: 1.1rem; color: #dbe7ff; margin-bottom: 0.9rem; }
     #again-btn { background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 0.6rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.05rem; }
     #again-btn:hover { background: rgba(0,212,255,0.12); }
 
@@ -113,7 +113,7 @@
     <div id="chips">
       <button class="chip" onclick="quickSearch('water bottle')">water bottle</button>
       <button class="chip" onclick="quickSearch('backpack')">backpack</button>
-      <button class="chip" onclick="quickSearch('keys')">keys</button>
+      <button class="chip" onclick="quickSearch('cell phone')">cell phone</button>
       <button class="chip" onclick="quickSearch('laptop')">laptop</button>
       <button class="chip" onclick="quickSearch('coffee mug')">coffee mug</button>
     </div>
@@ -135,6 +135,14 @@
       <div class="panel-body">
         <img id="video-feed" src="/video" alt="Live drone feed" />
         <div id="detection-badge">DETECTING</div>
+        <div id="result-overlay">
+          <div id="result-card">
+            <div id="result-heading"></div>
+            <img id="result-photo" alt="Found item" />
+            <p id="result-desc"></p>
+            <button id="again-btn" onclick="resetUI()">Search Again</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -144,15 +152,6 @@
     <div id="log-body"></div>
   </div>
 </main>
-
-<div id="result-overlay">
-  <div id="result-card">
-    <div id="result-heading"></div>
-    <img id="result-photo" alt="Found item" />
-    <p id="result-desc"></p>
-    <button id="again-btn" onclick="resetUI()">Search Again</button>
-  </div>
-</div>
 
 <script>
   let isSearching = false, userScrolledUp = false, detectionTimeout = null;
@@ -220,6 +219,7 @@
       case 'detection': onDetection(m.payload); break;
       case 'confirming': onConfirming(m.payload); break;
       case 'ai_confirming': onAiConfirming(m.payload); break;
+      case 'found_preview': onFoundPreview(m.payload); break;
       case 'result': onResult(m.payload); break;
     }
   }
@@ -247,6 +247,12 @@
     document.getElementById('stage-text').innerHTML = 'AI confirming the match <span class="mini-spinner"></span>';
   }
   function hideStage() { document.getElementById('stage').classList.remove('on', 'ai'); }
+  function onFoundPreview(p) {
+    hideStage();
+    document.getElementById('detection-badge').classList.remove('on');
+    if (p.found_cell) { pin = p.found_cell; dronePos = p.found_cell; drawMap(); }
+  }
+
   function onResult(p) {
     setSearching(false); hideStage();
     document.getElementById('detection-badge').classList.remove('on');

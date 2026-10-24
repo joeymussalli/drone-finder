@@ -137,12 +137,12 @@ class TestConfidenceWindow:
     # 2. Sequence [0.8, 0.6, 0.9] — sub-threshold resets window
     # ------------------------------------------------------------------
     def test_sub_threshold_in_sequence_resets_window(self):
-        """A frame below 0.7 must reset the window; no event should be emitted."""
+        """A frame below the confidence threshold must reset the window; no event emitted."""
         vm, callback = _make_vision_module()
         vm.set_query("cat")
 
         _drive_frame(vm, 0.80, "cat")
-        _drive_frame(vm, 0.60, "cat")   # resets the window
+        _drive_frame(vm, 0.30, "cat")   # below threshold -> resets the window
         _drive_frame(vm, 0.90, "cat")
 
         callback.assert_not_called()
@@ -158,7 +158,7 @@ class TestConfidenceWindow:
 
         _drive_frame(vm, 0.75, "cat")
         _drive_frame(vm, 0.80, "cat")
-        _drive_frame(vm, 0.50, "cat")   # below threshold
+        _drive_frame(vm, 0.30, "cat")   # below threshold
 
         callback.assert_not_called()
         assert len(vm._window) == 0

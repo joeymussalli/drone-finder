@@ -14,8 +14,11 @@ Before running, connect Windows to the ESP32 Wi-Fi network (DroneCamera).
 Run from the repository root:
     .\.venv\Scripts\python.exe -m scripts.recall_demo
 
+For a controlled demo where the whole search view is one known area:
+    .\.venv\Scripts\python.exe -m scripts.recall_demo --resolved-location "demo table"
+
 In the video window:
-    A  -> ask a question in the terminal (the camera pauses briefly)
+    A  -> type a question directly in the video window (camera pauses briefly)
     M  -> print everything currently remembered
     Q  -> quit (Escape or the window's X button also work)
 """
@@ -23,6 +26,7 @@ In the video window:
 import argparse
 import os
 import sys
+import textwrap
 import time
 
 # Ensure the repository root is importable so ``src`` resolves no matter how
@@ -54,30 +58,62 @@ def window_was_closed(cv2):
         return False
 
 
-def ask_once(service: QueryService, memory: ObjectMemory) -> None:
-    """Pause the camera loop and answer one typed question.
+def draw_message_panel(cv2, frame, lines):
+    """Draw readable text over the bottom of a copy of the camera frame."""
+    display = frame.copy()
+    line_height = 28
+    panel_height = min(display.shape[0], 24 + line_height * len(lines))
+    top = display.shape[0] - panel_height
+    cv2.rectangle(display, (0, top), (display.shape[1], display.shape[0]), (0, 0, 0), -1)
 
-    Reads from the terminal, so the video window is momentarily idle. This
-    keeps the demo single-threaded and robust: no shared-state races, no
-    thread shutdown to get wrong.
-    """
+    for index, line in enumerate(lines):
+        cv2.putText(
+            display,
+            line,
+            (12, top + 25 + index * line_height),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (255, 255, 255),
+            2,
+        )
+    return display
+
+
+def ask_once(cv2, frame, service: QueryService, memory: ObjectMemory) -> None:
+    """Let the user type and submit one question inside the video window."""
     known = memory.all_objects()
     if known:
-        print("\nRECALL knows about: " + ", ".join(known))
+        hint = "Known objects: " + ", ".join(known)
     else:
-        print("\nRECALL hasn't seen anything yet. Point the camera at an object first.")
+        hint = "No objects remembered yet"
 
-    try:
-        question = input("Ask RECALL (blank to cancel): ").strip()
-    except (EOFError, KeyboardInterrupt):
-        print("(cancelled)")
-        return
+    question = ""
+    while True:
+        prompt_lines = [hint, "Type a question, then press Enter (Esc cancels):"]
+        prompt_lines.extend(textwrap.wrap("> " + question, width=70) or ["> "])
+        cv2.imshow(WINDOW_NAME, draw_message_panel(cv2, frame, prompt_lines))
 
-    if not question:
-        print("(cancelled)")
-        return
+        key = cv2.waitKey(50) & 0xFF
+        if window_was_closed(cv2) or key == 27:
+            return
+        if key in (10, 13):
+            if question.strip():
+                break
+            continue
+        if key in (8, 127):
+            question = question[:-1]
+        elif 32 <= key <= 126:
+            question += chr(key)
 
-    print("RECALL:", service.answer_question(question), "\n")
+    answer = service.answer_question(question.strip())
+    print(f"Question: {question.strip()}")
+    print(f"RECALL: {answer}")
+
+    answer_lines = ["RECALL:"]
+    answer_lines.extend(textwrap.wrap(answer, width=70))
+    answer_lines.append("Press any key to return to the camera.")
+    cv2.imshow(WINDOW_NAME, draw_message_panel(cv2, frame, answer_lines))
+    cv2.waitKey(0)
 
 
 def print_memory(memory: ObjectMemory) -> None:
@@ -99,6 +135,14 @@ def parse_args():
     parser.add_argument("--retry-delay", type=float, default=2.0)
     parser.add_argument("--read-timeout", type=float, default=10.0)
     parser.add_argument("--confidence", type=float, default=0.50)
+    parser.add_argument(
+        "--resolved-location",
+        default=None,
+        help=(
+            "Known staged area containing the entire camera search view, such as "
+            "'demo table'. Leave unset while the drone moves between areas."
+        ),
+    )
     parser.add_argument(
         "--model",
         default=os.path.join(_REPO_ROOT, "yolov8s-worldv2.pt"),
@@ -168,6 +212,10 @@ def main():
     service = QueryService(memory)
 
     print(f"Looking for: {', '.join(args.objects)}")
+    if args.resolved_location:
+        print(f"Staged location: {args.resolved_location}")
+    else:
+        print("Location mode: unknown (no world localization supplied)")
     print("In the video window: A = ask, M = memory, Q = quit.")
 
     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_AUTOSIZE)
@@ -176,12 +224,12 @@ def main():
         while True:
             result = model.predict(frame, conf=args.confidence, verbose=False)[0]
             detections = detections_from_result(result, model)
-            # Moving camera, no synchronized world localization yet, so the
-            # object's room location is left unknown (honest "seen" memory).
+            # A named location is valid only when the camera's entire search
+            # view is deliberately constrained to that staged area.
             sightings = bridge.process_detections(
                 detections,
                 time.time(),
-                resolved_object_location=None,
+                resolved_object_location=args.resolved_location,
             )
             for sighting in sightings:
                 print(f"Remembered: {sighting!r}")
@@ -191,14 +239,31 @@ def main():
 
             cv2.imshow(WINDOW_NAME, frame)
             key = cv2.waitKey(1) & 0xFF
-            if key in (ord("q"), 27):
+            if key in (ord("q"), ord("Q"), 27):
                 break
             if window_was_closed(cv2):
                 print("Window closed. Stopping.")
                 break
-            if key == ord("a"):
-                ask_once(service, memory)
-            elif key == ord("m"):
+            if key in (ord("a"), ord("A")):
+                ask_once(cv2, frame, service, memory)
+                # The stream kept producing frames while the question UI was open.
+                # Reconnect so queued, stale frames are discarded before flight resumes.
+                stream.release()
+                stream, frame = connect_stream(
+                    cv2,
+                    numpy,
+                    args.stream_url,
+                    args.read_timeout,
+                    args.connection_attempts,
+                    args.retry_delay,
+                )
+                if stream is None:
+                    print("Could not reconnect after the question.")
+                    print_connection_help(args.webpage_url)
+                    break
+                print("Camera stream resumed. Click the video window for A/M/Q keys.")
+                continue
+            elif key in (ord("m"), ord("M")):
                 print_memory(memory)
 
             success, frame = stream.read()

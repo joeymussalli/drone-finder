@@ -92,3 +92,28 @@ type. The `curl.exe` command timing out after receiving bytes is expected becaus
 an MJPEG stream does not end. If the webpage works but port 81 does not, confirm
 that the ESP32 CameraWebServer sketch started its stream server and that its
 serial output reports the expected IP address.
+
+## Run the live RECALL demo
+
+Connect Windows to the `DroneCamera` Wi-Fi network, close any browser tab using
+the live stream, and run this command from a PowerShell terminal at the
+repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m scripts.recall_demo --resolved-location "demo table"
+```
+
+The `demo table` label is valid only when the entire search is deliberately
+confined to that staged area. Wait until a green detection box appears and the
+terminal prints `Remembered:` before asking about an object.
+
+With the video window focused:
+
+- Press **A**, type a question directly in the video window, and press Enter.
+- Press any key after reading the answer to resume the camera stream.
+- Press **M** to print all currently remembered objects.
+- Press **Q** or Escape to stop.
+
+For example, after the camera recognizes keys, press **A** and enter
+`where are my keys`. The detector and query service share the same live
+`ObjectMemory`, so the answer uses the sighting recorded by the camera.

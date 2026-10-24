@@ -1,4 +1,9 @@
-"""Zone: a named rectangular region of the camera frame."""
+"""A named rectangular region of one camera frame.
+
+A Zone describes image pixels, not a persistent real-world location. It can be
+used for a fixed camera or current-frame display, but a moving drone must not
+store these zone names as object locations without a world-location resolver.
+"""
 
 
 class Zone:

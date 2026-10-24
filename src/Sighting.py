@@ -5,9 +5,9 @@ import time
 
 class Sighting:
     # Constructor
-    def __init__(self, object_label: str, zone_name: str | None, confidence: float, timestamp: float):
+    def __init__(self, object_label: str, location_name: str | None, confidence: float, timestamp: float):
         self.object_label = object_label
-        self.zone_name = zone_name  # None means "seen but not in any known zone"
+        self.location_name = location_name  # None means "seen without a resolved world location"
         self.confidence = confidence
         self.timestamp = timestamp
 
@@ -30,9 +30,9 @@ class Sighting:
     # A short, friendly phrase describing where and when this was seen.
     def describe(self, now: float | None = None) -> str:
         when = self._time_ago_phrase(self.age_seconds(now))
-        if self.zone_name is None:
+        if self.location_name is None:
             return f"I saw your {self.object_label} {when}, but I'm not sure exactly where."
-        return f"I last saw your {self.object_label} on the {self.zone_name}, {when}."
+        return f"The last known location of your {self.object_label} is {self.location_name}, seen {when}."
 
     # Turn a number of seconds into a soft, human phrase.
     def _time_ago_phrase(self, seconds):
@@ -51,5 +51,5 @@ class Sighting:
         return f"about {int(round(hours))} hours ago"
 
     def __repr__(self):
-        return (f"Sighting({self.object_label!r}, zone={self.zone_name!r}, "
+        return (f"Sighting({self.object_label!r}, location={self.location_name!r}, "
                 f"conf={self.confidence}, t={self.timestamp})")

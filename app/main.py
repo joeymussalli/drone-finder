@@ -20,6 +20,7 @@ from app.llm.interface import LLMError, NullLLMAdapter
 from app.models import WSMessage
 from app.search_manager import SearchManager
 from app.vision.sim_video import SimVideoSource
+from app.vision.camera_stream import CameraStreamSource
 from app.vision.vision_module import VisionModule
 
 
@@ -87,22 +88,32 @@ async def lifespan(app: FastAPI):
         print(f"[FATAL] Configuration error: {exc}", file=sys.stderr)
         sys.exit(1)
 
-    _sim_mode = config.mode.lower() == "sim"
+    mode = config.mode.lower()
+    if mode not in ("sim", "camera", "real"):
+        print(f"[FATAL] MODE must be sim, camera or real (got '{config.mode}')", file=sys.stderr)
+        sys.exit(1)
+    _sim_mode = mode == "sim"
 
-    video_source: SimVideoSource | None = None
-    if _sim_mode:
-        drone = SimDroneAdapter(log_callback=lambda msg: None)
+    # sim:    sim photos  + fake drone   (judge demo, no hardware)
+    # camera: live camera + fake drone   (test detection by hand-holding the ESP32-CAM)
+    # real:   live camera + real drone
+    video_source = None
+    if mode == "sim":
         video_source = SimVideoSource(
             sim_images_dir=config.sim_images_dir,
             target_cell=config.sim_target_cell,
         )
     else:
+        video_source = CameraStreamSource(config.camera_url)
+        print(f"[INFO] Reading camera stream from {config.camera_url}", file=sys.stderr)
+
+    if mode == "real":
         drone = RealDroneAdapter(
             esp32_address=config.esp32_address,
             log_callback=lambda msg: None,
         )
-        # video_source stays None; SearchManager._get_raw_frame() will pull
-        # from the ESP32-CAM MJPEG URL in real mode (to be implemented).
+    else:
+        drone = SimDroneAdapter(log_callback=lambda msg: None)
 
     # LLM adapter: non-fatal at startup so the sim demo works without an API key.
     try:
@@ -181,6 +192,15 @@ async def websocket_endpoint(ws: WebSocket):
         pass
     finally:
         _manager.remove_client(ws)
+
+
+@app.get("/camera/status")
+async def camera_status():
+    """Connection status of the live camera (camera/real modes)."""
+    src = getattr(_manager, "_video_source", None)
+    if isinstance(src, CameraStreamSource):
+        return src.status()
+    return {"mode": "sim", "connected": False}
 
 
 async def _mjpeg_generator():

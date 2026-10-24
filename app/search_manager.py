@@ -95,7 +95,11 @@ class SearchManager:
 
     @property
     def _sim_mode(self) -> bool:
-        return self._video_source is not None
+        return isinstance(self._video_source, SimVideoSource)
+
+    @property
+    def _live_camera(self) -> bool:
+        return self._video_source is not None and not self._sim_mode
 
     # ------------------------------------------------------------------
     # WebSocket client management
@@ -172,6 +176,9 @@ class SearchManager:
 
     def get_current_frame(self) -> Optional[bytes]:
         """Return the most recent JPEG frame with bbox overlay (if any)."""
+        # Live camera while idle: show what the camera sees right now.
+        if self._live_camera and not self._is_searching:
+            return self._video_source.get_frame(self._cell)
         if self._last_frame_bytes is None:
             return None
         if self._last_bbox is not None:

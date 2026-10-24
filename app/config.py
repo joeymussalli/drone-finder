@@ -37,6 +37,8 @@ def load_config() -> AppConfig:
     # Optional: total target duration (seconds) for the full demo sweep.
     # Defaults to 35s when unset so existing .env files keep working.
     demo_speed_s = float(os.environ.get("DEMO_SPEED_S", "35"))
+    # Optional: ESP32-CAM MJPEG stream, used in "camera" and "real" modes.
+    camera_url = os.environ.get("CAMERA_URL", "http://192.168.4.1:81/stream").strip()
 
     return AppConfig(
         mode=mode,
@@ -49,4 +51,5 @@ def load_config() -> AppConfig:
         voice_input_enabled=voice_input_enabled,
         step_size_m=step_size_m,
         demo_speed_s=demo_speed_s,
+        camera_url=camera_url,
     )

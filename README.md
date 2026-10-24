@@ -80,24 +80,35 @@ Photo credits and licenses are in `sim_images/CREDITS.md`.
 > single `target.*` photo served at `SIM_TARGET_CELL`, with other images as
 > plain fillers.
 
-## Running with Real Hardware
+## Running with the ESP32-CAM
 
-1. Connect your laptop to the ESP32's Wi-Fi network (or same local network).
-2. In `.env`, set:
-   - `MODE=real`
-   - `ESP32_ADDRESS=<IP address of your ESP32>` (e.g. `192.168.4.1`)
-3. Make sure the ESP32-CAM stream URL is reachable from the laptop.
-4. Start the server:
-   ```
-   python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
-   ```
-5. Open your browser and go to: http://127.0.0.1:8000
-6. The live video feed from the ESP32-CAM will appear in the video panel.
-7. Type a search query and press **Search**.
-8. The drone will take off and begin the lawnmower sweep.
-9. Use the red **STOP** button at any time to land immediately.
+There are three modes, set by `MODE` in `.env`:
 
-> **Tip:** If the drone does not respond, check the `ESP32_ADDRESS` in `.env` and verify the ESP32 firmware is running and connected.
+| MODE | Camera | Drone | Use it for |
+|---|---|---|---|
+| `sim` | demo photos | simulated | judge demo with no hardware |
+| `camera` | live ESP32-CAM | simulated | testing detection by holding the camera |
+| `real` | live ESP32-CAM | real (ESP32) | the full flight |
+
+The ESP32-CAM makes its own Wi-Fi network (`DroneCamera`, password `drone12345`)
+and streams MJPEG at `http://192.168.4.1:81/stream`.
+
+1. Connect the laptop to the `DroneCamera` Wi-Fi. **The laptop loses internet
+   while on it** (no Claude confirmation step; the app still works). Use phone
+   USB tethering for internet if you need both.
+2. Close any browser tab showing the camera page. The ESP32 serves one stream
+   viewer at a time.
+3. Check the stream:
+   ```
+   python camera_check.py
+   python camera_check.py --detect "water bottle"
+   ```
+   It prints the resolution and frame rate and saves `camera_snapshot.jpg`.
+4. In `.env`, set `MODE=camera` (or `MODE=real` once flight control works).
+   Set `CAMERA_URL` if the stream address is different.
+5. Start the server (`run.bat`) and open http://127.0.0.1:8000. The camera
+   panel shows the live feed right away; `/camera/status` reports the connection.
+6. Search for an item and point the camera at it.
 
 ## Simulation Demo Checklist
 

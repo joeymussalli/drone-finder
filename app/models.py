@@ -125,7 +125,7 @@ class AppConfig:
     Loaded once at startup from the ``.env`` file via ``load_config()``.
     Injected into all components that need it.
     """
-    mode: str                       # "sim" | "real"
+    mode: str                       # "sim" | "camera" | "real"
     search_area: SearchArea
     sim_images_dir: str
     sim_target_cell: tuple[int, int]
@@ -135,6 +135,7 @@ class AppConfig:
     voice_input_enabled: bool
     step_size_m: float              # grid cell size for sweep
     demo_speed_s: float = 35.0      # target duration (s) for full demo sweep
+    camera_url: str = "http://192.168.4.1:81/stream"  # ESP32-CAM MJPEG stream (camera/real modes)
 
 
 # ---------------------------------------------------------------------------

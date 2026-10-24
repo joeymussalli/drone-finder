@@ -38,3 +38,6 @@ demo_videos/
 demo_videos_retake/
 record_demo_output.txt
 retake_output.txt
+
+# Camera check output
+camera_snapshot.jpg

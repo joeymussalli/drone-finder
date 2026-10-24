@@ -53,24 +53,25 @@ class FakeVideoSource:
 
 
 class FakeVision:
-    """Detects the active query's item only when the drone is on that item's
-    cell, and only after 2 consecutive frames there (mirrors WINDOW_SIZE=2).
+    """Detects the active query's item once the drone has VISITED that
+    item's cell. Detection keys off the drone's visited trail (mgr._trail),
+    which is updated synchronously on every cell entry, rather than the
+    instantaneous mgr._cell. That removes any dependence on frame-loop vs.
+    plan-loop timing (the real app dwells >1s per cell so the frame loop
+    always samples each cell; this keeps the fast test deterministic).
 
-    Crucially, it honours set_query()/reset() so that a window primed for one
-    item cannot satisfy a detection for another.
+    It honours set_query()/reset() so a detection primed for one item can
+    never satisfy a search for another -- the core behaviour under test.
     """
     def __init__(self, mgr_ref):
         self._mgr_ref = mgr_ref
         self._query = None
-        self._streak = 0
 
     def set_query(self, query):
         self._query = (query or "").lower()
-        self._streak = 0
 
     def reset(self):
         self._query = None
-        self._streak = 0
 
     def analyse_frame(self, frame, query):
         mgr = self._mgr_ref[0]
@@ -81,8 +82,9 @@ class FakeVision:
         for name, cell in ITEM_CELLS.items():
             if name in q or q in name:
                 target = cell
-        on_target = target is not None and mgr._cell == target
-        if on_target:
+        # Fire only once the target cell has actually been entered.
+        visited = target is not None and [target[0], target[1]] in mgr._trail
+        if visited:
             mgr.on_candidate_found(
                 CandidateFoundEvent(best_frame_bytes=b"\xff\xd8\xff\xd9",
                                     bbox=(1, 1, 5, 5), confidence=0.9))
@@ -103,7 +105,7 @@ def _make_manager():
     mgr = SearchManager(cfg, drone, NullLLMAdapter(), vision, vsrc)
     mgr_ref[0] = mgr
     # Speed the test up: no real dwell needed since FakeVision is instant.
-    mgr._cell_dwell_s = 0.05
+    mgr._cell_dwell_s = 0.2
     return mgr
 
 

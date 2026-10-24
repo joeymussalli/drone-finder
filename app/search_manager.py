@@ -192,25 +192,14 @@ class SearchManager:
         return self._last_frame_bytes
 
     def _get_raw_frame(self) -> Optional[bytes]:
-        """Pull the next raw frame from the video source."""
+        """Pull the next raw frame from the active video source.
+
+        In every mode a video source is set at startup: SimVideoSource for
+        sim, CameraStreamSource for camera/real. Returns None only if no
+        source is configured (should not happen in normal operation).
+        """
         if self._video_source is not None:
             return self._video_source.get_frame(self._cell)
-        return self._fetch_esp32cam_frame()
-
-    def _fetch_esp32cam_frame(self) -> Optional[bytes]:
-        """Pull a single JPEG frame from the ESP32-CAM MJPEG stream (best-effort)."""
-        try:
-            import urllib.request
-            cam_url = f"http://{self._config.esp32_address}:81/stream"
-            req = urllib.request.Request(cam_url)
-            with urllib.request.urlopen(req, timeout=1) as resp:
-                chunk = resp.read(65536)
-            soi = chunk.find(b'\xff\xd8')
-            eoi = chunk.find(b'\xff\xd9', soi)
-            if soi != -1 and eoi != -1:
-                return chunk[soi:eoi + 2]
-        except Exception:
-            pass
         return None
 
     # ------------------------------------------------------------------

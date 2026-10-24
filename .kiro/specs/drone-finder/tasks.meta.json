@@ -1,0 +1,507 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Project scaffold": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857779258
+      },
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857784965
+      },
+      {
+        "executionId": "a7b601c2-f3a4-4ce7-87dd-020772bb8e61",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858021981
+      },
+      {
+        "executionId": "a7b601c2-f3a4-4ce7-87dd-020772bb8e61",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858207387
+      }
+    ],
+    "2.1 Implement `load_config()` in `app/config.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857779432
+      },
+      {
+        "executionId": "a7b601c2-f3a4-4ce7-87dd-020772bb8e61",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858209627
+      },
+      {
+        "executionId": "585b0f0a-4191-4846-b935-691fa106ca4c",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858917783
+      },
+      {
+        "executionId": "560e6634-08ec-48be-a1f2-c9558f3a1741",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858998443
+      },
+      {
+        "executionId": "560e6634-08ec-48be-a1f2-c9558f3a1741",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859012253
+      }
+    ],
+    "3.1 Write all dataclasses and enums in `app/models.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857779599
+      },
+      {
+        "executionId": "a7b601c2-f3a4-4ce7-87dd-020772bb8e61",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858211268
+      },
+      {
+        "executionId": "585b0f0a-4191-4846-b935-691fa106ca4c",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858909564
+      }
+    ],
+    "4.1 Implement `DroneInterface` ABC in `app/drone/interface.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857779700
+      },
+      {
+        "executionId": "560e6634-08ec-48be-a1f2-c9558f3a1741",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859014467
+      },
+      {
+        "executionId": "560e6634-08ec-48be-a1f2-c9558f3a1741",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859062440
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859283629
+      }
+    ],
+    "4.2 Implement `SimDroneAdapter` in `app/drone/sim_adapter.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857779767
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859289408
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859330641
+      }
+    ],
+    "5.1 Implement `generate_plan()` in `app/planner/planner.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857779840
+      },
+      {
+        "executionId": "560e6634-08ec-48be-a1f2-c9558f3a1741",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859016265
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859285390
+      }
+    ],
+    "5.2 Implement `validate()` in `app/planner/safety_checker.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857779906
+      },
+      {
+        "executionId": "560e6634-08ec-48be-a1f2-c9558f3a1741",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859017929
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859287100
+      }
+    ],
+    "6.1 Implement `SimVideoSource` in `app/vision/sim_video.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780010
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859291024
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859332596
+      }
+    ],
+    "7.1 Implement `analyse_frame()` and confidence window in `app/vision/vision_module.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780095
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859336529
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859682047
+      }
+    ],
+    "8.1 Implement `LLMInterface` ABC in `app/llm/interface.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780170
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859292810
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859334388
+      }
+    ],
+    "8.2 Implement `ClaudeAdapter` in `app/llm/claude_adapter.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780245
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859338171
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859683964
+      }
+    ],
+    "9.1 Implement `SearchManager` in `app/search_manager.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780322
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859686206
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859768863
+      }
+    ],
+    "10.1 Implement `app/main.py` with FastAPI app, routes, and startup": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780398
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859770705
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859824182
+      }
+    ],
+    "11.1 Write `static/index.html` as a single self-contained file (HTML + CSS + JS inline, no build step)": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780477
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859826162
+      },
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859895229
+      }
+    ],
+    "12. Checkpoint — full sim demo passes": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780548
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860853399
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860856477
+      }
+    ],
+    "13.1 Write unit tests for `generate_plan()` in `tests/test_planner.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780644
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860859120
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860943392
+      }
+    ],
+    "13.6 Write unit tests for `validate()` in `tests/test_safety_checker.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780737
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860861106
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860945414
+      }
+    ],
+    "13.10 Write unit tests for Vision Module confidence window in `tests/test_vision_module.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780817
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860863037
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860947376
+      }
+    ],
+    "14.1 Flesh out `README.md` with complete numbered step lists for each section": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780894
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860865252
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860949621
+      }
+    ],
+    "14.2 Write end-to-end sim demo checklist as a `## Simulation Demo Checklist` section in `README.md`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857780964
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860867434
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860951863
+      }
+    ],
+    "15. Checkpoint — all tests pass": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857781036
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860954229
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860956037
+      }
+    ],
+    "16.1 Implement `RealDroneAdapter` in `app/drone/real_adapter.py`": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857781113
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860958404
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860980794
+      }
+    ],
+    "16.2 Wire `RealDroneAdapter` into `app/main.py` startup": [
+      {
+        "executionId": "e1021d99-af74-40e6-b79f-b5554647b05b",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792857781230
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860983327
+      },
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792861289895
+      }
+    ],
+    "3. Data models": [
+      {
+        "executionId": "585b0f0a-4191-4846-b935-691fa106ca4c",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792858909640
+      }
+    ],
+    "2. Config loader": [
+      {
+        "executionId": "560e6634-08ec-48be-a1f2-c9558f3a1741",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859012364
+      }
+    ],
+    "5. Planner and Safety Checker": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859287186
+      }
+    ],
+    "4. Drone Interface ABC and SimDroneAdapter": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859330726
+      }
+    ],
+    "6. SimVideoSource": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859332650
+      }
+    ],
+    "7. Vision Module": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859682193
+      }
+    ],
+    "8. LLM Interface ABC and ClaudeAdapter": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859684047
+      }
+    ],
+    "9. Search Manager": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859768954
+      }
+    ],
+    "10. FastAPI routes and MJPEG video endpoint": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859824292
+      }
+    ],
+    "11. Frontend": [
+      {
+        "executionId": "edaefea8-9126-4231-beec-1cc578d9d312",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792859895337
+      }
+    ],
+    "13. Unit tests and property-based tests": [
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860947432
+      }
+    ],
+    "14. End-to-end sim demo validation and README finalisation": [
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792860951919
+      }
+    ],
+    "16. RealDroneAdapter and ESP32 integration": [
+      {
+        "executionId": "9ccaa328-2254-4b2d-bdf5-ffcdfe044f31",
+        "chatSessionId": "sess_a2595600-4e5c-47df-a42c-c9ea31a50285",
+        "timestamp": 1792861289996
+      }
+    ]
+  }
+}

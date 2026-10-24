@@ -134,6 +134,7 @@ class AppConfig:
     esp32_address: str              # only used in real mode
     voice_input_enabled: bool
     step_size_m: float              # grid cell size for sweep
+    demo_speed_s: float = 35.0      # target duration (s) for full demo sweep
 
 
 # ---------------------------------------------------------------------------

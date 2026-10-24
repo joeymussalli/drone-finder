@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,476 +6,306 @@
   <title>Drone Finder</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    :root {
+      --bg: #0d1326; --panel: #14203e; --panel2: #0b1120;
+      --accent: #00d4ff; --accent2: #38f9a9; --danger: #ff3b3b;
+      --text: #eaf2ff; --muted: #8fa6c8;
+    }
+    html, body { height: 100%; }
     body {
-      font-family: system-ui, sans-serif;
-      background: #1a1a2e;
-      color: #e0e0e0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      font-family: system-ui, "Segoe UI", sans-serif;
+      background: radial-gradient(1200px 600px at 50% -10%, #1a2748, var(--bg));
+      color: var(--text);
+      height: 100vh; overflow: hidden;
+      display: flex; flex-direction: column;
     }
 
     header {
-      background: #16213e;
-      padding: 1rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 2px solid #00d4ff;
+      flex: 0 0 auto;
+      background: rgba(10,16,32,0.9);
+      padding: 0.5rem 1.2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 2px solid var(--accent);
     }
-
-    header h1 {
-      font-size: 1.5rem;
-      color: #00d4ff;
-      letter-spacing: 2px;
-    }
-
-    #stop-btn {
-      background: #ff3333;
-      color: #fff;
-      border: none;
-      padding: 0.6rem 1.4rem;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: background 0.15s;
-    }
-    #stop-btn:hover { background: #cc0000; }
+    header h1 { font-size: 1.3rem; color: var(--accent); letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
+    #sim-pill { font-size: 0.65rem; letter-spacing: 1px; background: var(--accent2); color: #04221a; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 800; display: none; }
+    #sim-pill.on { display: inline-block; }
+    #stop-btn { background: var(--danger); color: #fff; border: none; padding: 0.55rem 1.3rem; font-size: 1rem; font-weight: 800; border-radius: 8px; cursor: pointer; letter-spacing: 1px; }
+    #stop-btn:hover { background: #d92626; }
 
     main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto 1fr;
-      gap: 1rem;
-      padding: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
+      flex: 1 1 auto; min-height: 0;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      max-width: 1500px; margin: 0 auto; width: 100%;
     }
 
-    /* Search bar spans full width */
-    #search-bar {
-      grid-column: 1 / -1;
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: flex-start;
-    }
-
-    #search-wrap {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    #query-input {
-      width: 100%;
-      padding: 0.65rem 1rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 2px solid #00d4ff;
-      background: #0f3460;
-      color: #fff;
-      outline: none;
-    }
-    #query-input:disabled { opacity: 0.5; cursor: not-allowed; }
-    #query-input::placeholder { color: #88aacc; }
-
-    #validation-msg {
-      color: #ff6666;
-      font-size: 0.8rem;
-      margin-top: 0.25rem;
-      min-height: 1em;
-    }
-
-    #search-btn {
-      padding: 0.65rem 1.4rem;
-      font-size: 1rem;
-      font-weight: 600;
-      background: #00d4ff;
-      color: #1a1a2e;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-    #search-btn:hover { background: #00b8db; }
+    /* search row (compact) */
+    #search-row { flex: 0 0 auto; display: flex; flex-direction: column; gap: 0.35rem; }
+    #search-bar { display: flex; gap: 0.5rem; align-items: center; }
+    #query-input { flex: 1; min-width: 180px; padding: 0.6rem 0.9rem; font-size: 1.05rem; border-radius: 8px; border: 2px solid var(--accent); background: #0b2038; color: #fff; outline: none; }
+    #query-input:disabled { opacity: 0.5; }
+    #search-btn { padding: 0.6rem 1.3rem; font-size: 1.05rem; font-weight: 700; background: var(--accent); color: #04121f; border: none; border-radius: 8px; cursor: pointer; }
     #search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .chip { background: #16294b; color: var(--accent); border: 1px solid #27508a; border-radius: 999px; padding: 0.3rem 0.85rem; font-size: 0.95rem; cursor: pointer; }
+    .chip:hover { background: #1d3763; }
+    .chip:disabled { opacity: 0.4; cursor: not-allowed; }
+    #validation-msg { color: #ff8a8a; font-size: 0.9rem; min-height: 0; }
+    #validation-msg:empty { display: none; }
 
-    #searching-indicator {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      color: #00d4ff;
-      font-size: 0.9rem;
-      padding: 0.65rem 0;
-    }
-    #searching-indicator.active { display: flex; }
-    .spinner {
-      width: 18px; height: 18px;
-      border: 3px solid #00d4ff44;
-      border-top-color: #00d4ff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
+    /* stage banner (compact) */
+    #stage { display: none; flex: 0 0 auto; align-items: center; gap: 0.6rem; padding: 0.45rem 0.9rem; border-radius: 10px; background: #10244a; border: 1px solid #27508a; font-size: 1.05rem; font-weight: 700; }
+    #stage.on { display: flex; }
+    #stage .dots { display: flex; gap: 0.35rem; }
+    #stage .dot { width: 13px; height: 13px; border-radius: 50%; background: #27405f; transition: all 0.2s; }
+    #stage .dot.lit { background: var(--accent2); transform: scale(1.25); }
+    #stage.ai { color: var(--accent2); }
+    .mini-spinner { width: 17px; height: 17px; border-radius: 50%; border: 3px solid rgba(56,249,169,0.25); border-top-color: var(--accent2); animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Video panel */
-    #video-panel {
-      position: relative;
-      background: #000;
-      border-radius: 8px;
-      overflow: hidden;
-      aspect-ratio: 4/3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    /* panels fill remaining height */
+    #stage-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+    .panel { background: var(--panel); border: 1px solid #22345c; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+    .panel h2 { flex: 0 0 auto; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); padding: 0.4rem 0.8rem; border-bottom: 1px solid #22345c; }
+    .panel-body { flex: 1 1 auto; min-height: 0; position: relative; background: var(--panel2); display: flex; align-items: center; justify-content: center; }
+    #map-canvas, #video-feed { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; object-fit: contain; }
+    #detection-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,212,255,0.9); color: #04121f; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.9rem; font-weight: 800; display: none; }
+    #detection-badge.on { display: block; }
 
-    #video-feed {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
+    /* short status log */
+    #log-panel { flex: 0 0 auto; background: var(--panel2); border: 1px solid #22345c; border-radius: 10px; }
+    #log-head { padding: 0.3rem 0.8rem; color: var(--muted); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid #22345c; }
+    #log-body { height: 66px; overflow-y: auto; padding: 0.3rem 0.8rem; font-family: "Consolas", monospace; font-size: 0.9rem; line-height: 1.45; }
+    .log-line.error { color: #ff8a8a; }
 
-    #detection-badge {
-      display: none;
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(0, 212, 255, 0.85);
-      color: #1a1a2e;
-      padding: 0.3rem 0.7rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-    #detection-badge.visible { display: block; }
+    /* result overlay (modal) */
+    #result-overlay { position: fixed; inset: 0; background: rgba(5,9,20,0.82); display: none; align-items: center; justify-content: center; z-index: 50; }
+    #result-overlay.on { display: flex; }
+    #result-card { background: var(--panel); border: 2px solid var(--accent); border-radius: 16px; padding: 1.6rem 2rem; text-align: center; max-width: 620px; max-height: 92vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+    #result-heading { font-size: 2.1rem; font-weight: 800; margin-bottom: 0.9rem; }
+    #result-heading.found { color: var(--accent2); }
+    #result-heading.not-found { color: #ff8a8a; }
+    #result-photo { max-width: 100%; max-height: 42vh; border-radius: 10px; margin-bottom: 0.9rem; display: none; border: 3px solid var(--accent2); }
+    #result-photo.on { display: inline-block; }
+    #result-desc { font-size: 1.3rem; color: #dbe7ff; margin-bottom: 1.1rem; }
+    #again-btn { background: transparent; border: 2px solid var(--accent); color: var(--accent); padding: 0.6rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1.05rem; }
+    #again-btn:hover { background: rgba(0,212,255,0.12); }
 
-    /* Status log */
-    #log-panel {
-      background: #0f0f23;
-      border-radius: 8px;
-      border: 1px solid #2a2a4a;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    #log-header {
-      padding: 0.5rem 1rem;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #88aacc;
-      border-bottom: 1px solid #2a2a4a;
-      flex-shrink: 0;
-    }
-
-    #log-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0.5rem 0.75rem;
-      font-family: 'Courier New', monospace;
-      font-size: 0.78rem;
-      line-height: 1.5;
-      min-height: 200px;
-      max-height: 400px;
-    }
-
-    .log-line { padding: 1px 0; word-break: break-word; }
-    .log-line.error { color: #ff6666; }
-
-    /* Result card */
-    #result-card {
-      display: none;
-      grid-column: 1 / -1;
-      background: #16213e;
-      border: 2px solid #00d4ff;
-      border-radius: 10px;
-      padding: 1.5rem;
-      text-align: center;
-    }
-    #result-card.visible { display: block; }
-
-    #result-heading {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-    #result-heading.found { color: #00d4ff; }
-    #result-heading.not-found { color: #ff6666; }
-
-    #result-photo {
-      max-width: 320px;
-      max-height: 240px;
-      border-radius: 6px;
-      margin-bottom: 1rem;
-      display: none;
-    }
-    #result-photo.visible { display: inline-block; }
-
-    #result-description {
-      font-size: 1rem;
-      color: #ccc;
-      margin-bottom: 1.2rem;
-    }
-
-    #search-again-btn {
-      background: transparent;
-      border: 2px solid #00d4ff;
-      color: #00d4ff;
-      padding: 0.5rem 1.2rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: background 0.15s;
-    }
-    #search-again-btn:hover { background: #00d4ff22; }
-
-    @media (max-width: 700px) {
-      main { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 900px) { #stage-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>🚁 DRONE FINDER</h1>
-  <button id="stop-btn" onclick="doStop()">■ STOP</button>
+  <h1>DRONE FINDER <span id="sim-pill">SIM</span></h1>
+  <button id="stop-btn" onclick="doStop()">STOP</button>
 </header>
 
 <main>
-  <!-- Search bar -->
-  <div id="search-bar">
-    <div id="search-wrap">
-      <input
-        id="query-input"
-        type="text"
-        maxlength="200"
+  <div id="search-row">
+    <div id="search-bar">
+      <input id="query-input" type="text" maxlength="200"
         placeholder="What are you looking for? e.g. blue water bottle"
-        oninput="clearValidation()"
-        onkeydown="if(event.key==='Enter') doSearch()"
-      />
-      <div id="validation-msg"></div>
+        oninput="clearValidation()" onkeydown="if(event.key==='Enter') doSearch()" />
+      <button id="search-btn" onclick="doSearch()">Search</button>
     </div>
-    <button id="search-btn" onclick="doSearch()">🔍 Search</button>
-    <div id="searching-indicator">
-      <div class="spinner"></div>
-      <span>Searching…</span>
+    <div id="chips">
+      <button class="chip" onclick="quickSearch('water bottle')">water bottle</button>
+      <button class="chip" onclick="quickSearch('backpack')">backpack</button>
+      <button class="chip" onclick="quickSearch('keys')">keys</button>
+      <button class="chip" onclick="quickSearch('laptop')">laptop</button>
+      <button class="chip" onclick="quickSearch('coffee mug')">coffee mug</button>
+    </div>
+    <div id="validation-msg"></div>
+  </div>
+
+  <div id="stage">
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <span id="stage-text">Searching...</span>
+  </div>
+
+  <div id="stage-grid">
+    <div class="panel">
+      <h2>Room Map (top-down)</h2>
+      <div class="panel-body"><canvas id="map-canvas" width="800" height="600"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Drone Camera</h2>
+      <div class="panel-body">
+        <img id="video-feed" src="/video" alt="Live drone feed" />
+        <div id="detection-badge">DETECTING</div>
+      </div>
     </div>
   </div>
 
-  <!-- Video panel -->
-  <div id="video-panel">
-    <img id="video-feed" src="/video" alt="Live drone feed" />
-    <div id="detection-badge">🔍 Detecting…</div>
-  </div>
-
-  <!-- Status log -->
   <div id="log-panel">
-    <div id="log-header">Status Log</div>
+    <div id="log-head">Status Log</div>
     <div id="log-body"></div>
-  </div>
-
-  <!-- Result card (hidden until result arrives) -->
-  <div id="result-card">
-    <div id="result-heading"></div>
-    <img id="result-photo" alt="Found item" />
-    <p id="result-description"></p>
-    <button id="search-again-btn" onclick="resetUI()">Search Again</button>
   </div>
 </main>
 
+<div id="result-overlay">
+  <div id="result-card">
+    <div id="result-heading"></div>
+    <img id="result-photo" alt="Found item" />
+    <p id="result-desc"></p>
+    <button id="again-btn" onclick="resetUI()">Search Again</button>
+  </div>
+</div>
+
 <script>
-  // -----------------------------------------------------------------------
-  // State
-  // -----------------------------------------------------------------------
-  let isSearching = false;
-  let userScrolledUp = false;
-  let detectionTimeout = null;
+  let isSearching = false, userScrolledUp = false, detectionTimeout = null;
+  let grid = { cols: 1, rows: 1, target: null, sim: false };
+  let dronePos = null, trail = [], pin = null, pulse = 0;
 
-  // -----------------------------------------------------------------------
-  // WebSocket
-  // -----------------------------------------------------------------------
-  const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  let ws;
+  const canvas = document.getElementById('map-canvas');
+  const ctx = canvas.getContext('2d');
 
-  function connectWS() {
-    ws = new WebSocket(`${wsProto}//${location.host}/ws`);
-
-    ws.onmessage = (evt) => {
-      let msg;
-      try { msg = JSON.parse(evt.data); } catch { return; }
-      handleMessage(msg);
-    };
-
-    ws.onclose = () => {
-      // Reconnect after 2 s
-      setTimeout(connectWS, 2000);
-    };
-  }
-
-  function handleMessage(msg) {
-    switch (msg.type) {
-      case 'status':
-        appendLog(msg.payload.message, false);
-        break;
-      case 'error':
-        appendLog(msg.payload.message, true);
-        break;
-      case 'detection':
-        showDetectionBadge();
-        break;
-      case 'result':
-        handleResult(msg.payload);
-        break;
+  function drawMap() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const pad = 40, gw = W - pad*2, gh = H - pad*2;
+    const cw = gw / grid.cols, ch = gh / grid.rows;
+    ctx.fillStyle = '#0a1a33'; ctx.fillRect(pad, pad, gw, gh);
+    ctx.strokeStyle = '#1b3a5c'; ctx.lineWidth = 2;
+    for (let c = 0; c <= grid.cols; c++) { ctx.beginPath(); ctx.moveTo(pad+c*cw, pad); ctx.lineTo(pad+c*cw, pad+gh); ctx.stroke(); }
+    for (let r = 0; r <= grid.rows; r++) { ctx.beginPath(); ctx.moveTo(pad, pad+r*ch); ctx.lineTo(pad+gw, pad+r*ch); ctx.stroke(); }
+    const cx = (c) => pad + c*cw + cw/2, cy = (r) => pad + r*ch + ch/2;
+    if (trail.length > 1) {
+      ctx.strokeStyle = 'rgba(31,111,235,0.7)'; ctx.lineWidth = Math.max(4, Math.min(cw,ch)*0.18);
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
+      ctx.moveTo(cx(trail[0][0]), cy(trail[0][1]));
+      for (let i = 1; i < trail.length; i++) ctx.lineTo(cx(trail[i][0]), cy(trail[i][1]));
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(31,111,235,0.18)';
+    for (const [c, r] of trail) ctx.fillRect(pad+c*cw, pad+r*ch, cw, ch);
+    if (dronePos) {
+      ctx.fillStyle = 'rgba(0,212,255,0.28)'; ctx.fillRect(pad+dronePos[0]*cw, pad+dronePos[1]*ch, cw, ch);
+      ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 3; ctx.strokeRect(pad+dronePos[0]*cw, pad+dronePos[1]*ch, cw, ch);
+    }
+    if (pin) {
+      const px = cx(pin[0]), py = cy(pin[1]), rad = Math.max(10, Math.min(cw,ch)*0.22);
+      ctx.fillStyle = '#38f9a9';
+      ctx.beginPath(); ctx.arc(px, py-rad, rad, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(px-rad*0.7, py-rad); ctx.lineTo(px, py+rad*0.9); ctx.lineTo(px+rad*0.7, py-rad); ctx.fill();
+      ctx.fillStyle = '#04221a'; ctx.beginPath(); ctx.arc(px, py-rad, rad*0.4, 0, Math.PI*2); ctx.fill();
+    }
+    if (dronePos) {
+      const dx = cx(dronePos[0]), dy = cy(dronePos[1]);
+      const base = Math.max(12, Math.min(cw,ch)*0.3), p = pin ? (1 + 0.25*Math.sin(pulse)) : 1, rad = base*p;
+      ctx.fillStyle = '#00d4ff'; ctx.beginPath(); ctx.arc(dx, dy, rad*0.45, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 3;
+      for (const [ox, oy] of [[-1,-1],[1,-1],[-1,1],[1,1]]) { ctx.beginPath(); ctx.arc(dx+ox*rad*0.6, dy+oy*rad*0.6, rad*0.3, 0, Math.PI*2); ctx.stroke(); }
     }
   }
+  function animate() { pulse += 0.15; if (pin) drawMap(); requestAnimationFrame(animate); }
+  requestAnimationFrame(animate);
 
-  // -----------------------------------------------------------------------
-  // Log
-  // -----------------------------------------------------------------------
+  const wsProto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  let ws;
+  function connectWS() {
+    ws = new WebSocket(`${wsProto}//${location.host}/ws`);
+    ws.onmessage = (e) => { let m; try { m = JSON.parse(e.data); } catch { return; } handle(m); };
+    ws.onclose = () => setTimeout(connectWS, 1500);
+  }
+  function handle(m) {
+    switch (m.type) {
+      case 'status': appendLog(m.payload.message, false); break;
+      case 'error': appendLog(m.payload.message, true); break;
+      case 'debug': break; // raw [SIM]/move lines are not shown on the projector
+      case 'grid': onGrid(m.payload); break;
+      case 'position': onPosition(m.payload); break;
+      case 'detection': onDetection(m.payload); break;
+      case 'confirming': onConfirming(m.payload); break;
+      case 'ai_confirming': onAiConfirming(m.payload); break;
+      case 'result': onResult(m.payload); break;
+    }
+  }
+  function onGrid(p) {
+    grid = { cols: p.cols, rows: p.rows, target: p.target_cell, sim: p.sim };
+    document.getElementById('sim-pill').classList.toggle('on', !!p.sim);
+    trail = []; dronePos = null; pin = null; drawMap();
+  }
+  function onPosition(p) { dronePos = [p.col, p.row]; trail = p.trail || trail; drawMap(); }
+  function onDetection(p) {
+    const b = document.getElementById('detection-badge'); b.classList.add('on');
+    clearTimeout(detectionTimeout); detectionTimeout = setTimeout(() => b.classList.remove('on'), 1200);
+  }
+  function setStage(text, litCount, ai) {
+    const stage = document.getElementById('stage');
+    stage.classList.add('on'); stage.classList.toggle('ai', !!ai);
+    document.getElementById('stage-text').textContent = text;
+    stage.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('lit', i < litCount));
+  }
+  function onConfirming(p) { setStage(`Spotted it - confirming ${p.stage}/${p.of}`, p.stage, false); }
+  function onAiConfirming(p) {
+    const stage = document.getElementById('stage');
+    stage.classList.add('on', 'ai');
+    stage.querySelectorAll('.dot').forEach(d => d.classList.add('lit'));
+    document.getElementById('stage-text').innerHTML = 'AI confirming the match <span class="mini-spinner"></span>';
+  }
+  function hideStage() { document.getElementById('stage').classList.remove('on', 'ai'); }
+  function onResult(p) {
+    setSearching(false); hideStage();
+    document.getElementById('detection-badge').classList.remove('on');
+    if (p.found && p.found_cell) { pin = p.found_cell; dronePos = p.found_cell; drawMap(); }
+    const h = document.getElementById('result-heading');
+    const photo = document.getElementById('result-photo');
+    const desc = document.getElementById('result-desc');
+    if (p.found) {
+      h.textContent = 'Found it!'; h.className = 'found';
+      desc.textContent = p.description || '';
+      if (p.photo) { photo.src = 'data:image/jpeg;base64,' + p.photo; photo.classList.add('on'); } else photo.classList.remove('on');
+    } else {
+      h.textContent = 'Not found'; h.className = 'not-found';
+      desc.textContent = p.message || 'The drone completed the full sweep without finding the item.';
+      photo.classList.remove('on');
+    }
+    document.getElementById('result-overlay').classList.add('on');
+  }
+
   const logBody = document.getElementById('log-body');
-
   function appendLog(text, isError) {
     const line = document.createElement('div');
     line.className = 'log-line' + (isError ? ' error' : '');
-    line.textContent = text;
-    logBody.appendChild(line);
-
-    // Trim to 200 entries
-    while (logBody.children.length > 200) {
-      logBody.removeChild(logBody.firstChild);
-    }
-
-    // Auto-scroll unless user scrolled up
-    if (!userScrolledUp) {
-      logBody.scrollTop = logBody.scrollHeight;
-    }
+    line.textContent = text; logBody.appendChild(line);
+    while (logBody.children.length > 200) logBody.removeChild(logBody.firstChild);
+    if (!userScrolledUp) logBody.scrollTop = logBody.scrollHeight;
   }
-
   logBody.addEventListener('scroll', () => {
     const atBottom = logBody.scrollHeight - logBody.scrollTop <= logBody.clientHeight + 4;
     userScrolledUp = !atBottom;
   });
 
-  // -----------------------------------------------------------------------
-  // Detection badge
-  // -----------------------------------------------------------------------
-  function showDetectionBadge() {
-    const badge = document.getElementById('detection-badge');
-    badge.classList.add('visible');
-    clearTimeout(detectionTimeout);
-    detectionTimeout = setTimeout(() => badge.classList.remove('visible'), 3000);
-  }
-
-  // -----------------------------------------------------------------------
-  // Search
-  // -----------------------------------------------------------------------
+  function quickSearch(q) { document.getElementById('query-input').value = q; doSearch(); }
   async function doSearch() {
     const input = document.getElementById('query-input');
     const query = input.value.trim();
-    if (!query) {
-      document.getElementById('validation-msg').textContent = 'Please enter what you are looking for.';
-      return;
-    }
-
-    setSearching(true);
-    hideResultCard();
-
+    if (!query) { document.getElementById('validation-msg').textContent = 'Please enter what you are looking for.'; return; }
+    setSearching(true); hideResult(); pin = null;
     try {
-      const resp = await fetch('/search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
-      });
-      if (!resp.ok) {
-        const data = await resp.json();
-        document.getElementById('validation-msg').textContent = data.error || 'Search failed.';
-        setSearching(false);
-      }
-    } catch (e) {
-      document.getElementById('validation-msg').textContent = 'Could not reach the server.';
-      setSearching(false);
-    }
+      const resp = await fetch('/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query }) });
+      if (!resp.ok) { const d = await resp.json(); document.getElementById('validation-msg').textContent = d.error || 'Search failed.'; setSearching(false); }
+    } catch (e) { document.getElementById('validation-msg').textContent = 'Could not reach the server.'; setSearching(false); }
   }
-
   async function doStop() {
-    try {
-      await fetch('/stop', { method: 'POST' });
-    } catch (e) {
-      appendLog('[ERROR] Could not send stop command.', true);
-    }
-    setSearching(false);
+    try { await fetch('/stop', { method: 'POST' }); } catch (e) { appendLog('[ERROR] Could not send stop command.', true); }
+    setSearching(false); hideStage();
   }
-
-  function clearValidation() {
-    document.getElementById('validation-msg').textContent = '';
-  }
-
+  function clearValidation() { document.getElementById('validation-msg').textContent = ''; }
   function setSearching(on) {
     isSearching = on;
     document.getElementById('query-input').disabled = on;
     document.getElementById('search-btn').disabled = on;
-    document.getElementById('searching-indicator').classList.toggle('active', on);
+    document.querySelectorAll('.chip').forEach(c => c.disabled = on);
+    if (on) setStage('Searching...', 0, false); else hideStage();
   }
+  function hideResult() { document.getElementById('result-overlay').classList.remove('on'); document.getElementById('result-photo').classList.remove('on'); }
+  function resetUI() { hideResult(); document.getElementById('query-input').value = ''; clearValidation(); setSearching(false); pin = null; trail = []; dronePos = null; drawMap(); }
 
-  // -----------------------------------------------------------------------
-  // Result card
-  // -----------------------------------------------------------------------
-  function handleResult(payload) {
-    setSearching(false);
-    document.getElementById('detection-badge').classList.remove('visible');
-
-    const card = document.getElementById('result-card');
-    const heading = document.getElementById('result-heading');
-    const photo = document.getElementById('result-photo');
-    const desc = document.getElementById('result-description');
-
-    if (payload.found) {
-      heading.textContent = 'Found it! 🎯';
-      heading.className = 'found';
-      desc.textContent = payload.description || '';
-
-      if (payload.photo) {
-        photo.src = 'data:image/jpeg;base64,' + payload.photo;
-        photo.classList.add('visible');
-      } else {
-        photo.classList.remove('visible');
-      }
-    } else {
-      heading.textContent = 'Not found 😔';
-      heading.className = 'not-found';
-      desc.textContent = payload.message || 'The drone completed the full sweep without finding the item.';
-      photo.classList.remove('visible');
-    }
-
-    card.classList.add('visible');
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  function hideResultCard() {
-    document.getElementById('result-card').classList.remove('visible');
-    document.getElementById('result-photo').classList.remove('visible');
-  }
-
-  function resetUI() {
-    hideResultCard();
-    document.getElementById('query-input').value = '';
-    clearValidation();
-    setSearching(false);
-  }
-
-  // -----------------------------------------------------------------------
-  // Boot
-  // -----------------------------------------------------------------------
-  connectWS();
+  drawMap(); connectWS();
 </script>
 
 </body>

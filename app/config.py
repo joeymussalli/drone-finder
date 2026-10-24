@@ -34,6 +34,9 @@ def load_config() -> AppConfig:
     esp32_address = require("ESP32_ADDRESS")
     voice_input_enabled = require("VOICE_INPUT_ENABLED").strip().lower() == "true"
     step_size_m = float(require("STEP_SIZE_M"))
+    # Optional: total target duration (seconds) for the full demo sweep.
+    # Defaults to 35s when unset so existing .env files keep working.
+    demo_speed_s = float(os.environ.get("DEMO_SPEED_S", "35"))
 
     return AppConfig(
         mode=mode,
@@ -45,4 +48,5 @@ def load_config() -> AppConfig:
         esp32_address=esp32_address,
         voice_input_enabled=voice_input_enabled,
         step_size_m=step_size_m,
+        demo_speed_s=demo_speed_s,
     )

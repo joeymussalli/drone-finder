@@ -56,15 +56,18 @@ def _overlay_sim_label(jpeg_bytes: bytes) -> bytes:
     frame = cv2.imdecode(buf, cv2.IMREAD_COLOR)
     if frame is None:
         return jpeg_bytes
+    # Small corner badge: a compact filled pill with small text so the
+    # camera view stays unobstructed.
+    label = "SIM"
+    scale = 0.5
+    thick = 1
+    (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, scale, thick)
+    pad = 5
+    x0, y0 = 8, 8
+    cv2.rectangle(frame, (x0, y0), (x0 + tw + 2 * pad, y0 + th + 2 * pad), (0, 40, 40), -1)
     cv2.putText(
-        frame,
-        "SIMULATION",
-        (10, 30),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.9,
-        (0, 255, 255),
-        2,
-        cv2.LINE_AA,
+        frame, label, (x0 + pad, y0 + th + pad - 1),
+        cv2.FONT_HERSHEY_SIMPLEX, scale, (0, 255, 255), thick, cv2.LINE_AA,
     )
     _, enc = cv2.imencode(".jpg", frame)
     return enc.tobytes()
@@ -121,7 +124,9 @@ async def lifespan(app: FastAPI):
     vision._callback = manager.on_candidate_found
 
     async def _drone_log(msg: str) -> None:
-        await manager._log(msg)
+        # Raw [SIM]/hardware command lines go to debug so the projector
+        # status log stays clean; they remain in the server buffer.
+        await manager._log(msg, level="debug")
 
     drone._log = _drone_log
     _manager = manager

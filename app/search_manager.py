@@ -78,9 +78,12 @@ class SearchManager:
         reserved_s = 4.0  # takeoff + land + confirm animation overhead
         budget_s = max(2.0, config.demo_speed_s - reserved_s)
         per_cell = budget_s / total_cells
-        # Floor: enough for the 3-frame vision window at DETECTION_FPS.
-        min_dwell = 3.5 / self.DETECTION_FPS
-        self._cell_dwell_s = max(min_dwell, min(1.0, per_cell))
+        # Floor is a wall-clock minimum so that, even on a slow CPU where a
+        # single YOLO inference takes a few hundred ms, the drone lingers on
+        # each cell long enough for the vision window (WINDOW_SIZE frames) to
+        # accumulate. Inference runs off-thread, so dwell time is usable.
+        min_dwell = 1.1
+        self._cell_dwell_s = max(min_dwell, min(1.4, per_cell))
 
     @property
     def _sim_mode(self) -> bool:
@@ -350,7 +353,10 @@ class SearchManager:
             buf = np.frombuffer(raw, dtype=np.uint8)
             frame = cv2.imdecode(buf, cv2.IMREAD_COLOR)
             if frame is not None:
-                result = self._vision.analyse_frame(frame, query)
+                # YOLO inference is CPU-bound and blocking; run it in a
+                # worker thread so it does not freeze the event loop (which
+                # would starve the per-cell dwell and limit frames per cell).
+                result = await asyncio.to_thread(self._vision.analyse_frame, frame, query)
                 if result.detected:
                     self._last_bbox = result.bbox
                     await self.broadcast(WSMessage(

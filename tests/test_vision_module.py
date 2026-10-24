@@ -151,14 +151,14 @@ class TestConfidenceWindow:
     # ------------------------------------------------------------------
     # 3. Exactly 2 high-confidence then 1 low → no event
     # ------------------------------------------------------------------
-    def test_two_high_then_low_no_event(self):
-        """Two consecutive high-confidence frames followed by a low one must not emit."""
+    def test_one_high_then_low_no_event(self):
+        """A single high-confidence frame followed by a low one must not emit
+        (the window needs WINDOW_SIZE=2 consecutive detections)."""
         vm, callback = _make_vision_module()
         vm.set_query("cat")
 
-        _drive_frame(vm, 0.75, "cat")
         _drive_frame(vm, 0.80, "cat")
-        _drive_frame(vm, 0.30, "cat")   # below threshold
+        _drive_frame(vm, 0.30, "cat")   # below threshold -> resets
 
         callback.assert_not_called()
         assert len(vm._window) == 0
@@ -166,18 +166,18 @@ class TestConfidenceWindow:
     # ------------------------------------------------------------------
     # 4. Four consecutive high-confidence frames → exactly 1 event, window resets
     # ------------------------------------------------------------------
-    def test_four_consecutive_high_emits_once(self):
-        """After emitting on frame 3 the window resets; frame 4 alone cannot trigger a second event."""
+    def test_three_consecutive_high_emits_once(self):
+        """With WINDOW_SIZE=2, two highs emit once and the window resets; a
+        third high alone starts a fresh window and cannot emit again yet."""
         vm, callback = _make_vision_module()
         vm.set_query("cat")
 
         _drive_frame(vm, 0.75, "cat")
-        _drive_frame(vm, 0.80, "cat")
-        _drive_frame(vm, 0.90, "cat")   # triggers event, window cleared
-        _drive_frame(vm, 0.85, "cat")   # 1 item in window — not enough
+        _drive_frame(vm, 0.80, "cat")   # 2 consecutive -> triggers, window cleared
+        _drive_frame(vm, 0.85, "cat")   # 1 item in window - not enough
 
         assert callback.call_count == 1
-        assert len(vm._window) == 1     # fourth frame sits alone
+        assert len(vm._window) == 1     # third frame sits alone
 
     # ------------------------------------------------------------------
     # 5. FrameResult confidence clamped to [0.0, 1.0]
@@ -225,8 +225,7 @@ class TestConfidenceWindow:
         vm.set_query("cat")
 
         _drive_frame(vm, 0.80, "cat")
-        _drive_frame(vm, 0.75, "cat")
-        _drive_no_detection(vm, "cat")  # interrupts the run
+        _drive_no_detection(vm, "cat")  # interrupts before a 2nd detection
 
         callback.assert_not_called()
         assert len(vm._window) == 0

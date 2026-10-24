@@ -6,61 +6,48 @@ from app.models import (
 )
 
 
+def _grid_dims(area: SearchArea, step_size_m: float) -> tuple[int, int]:
+    """Return (num_cols, num_rows) of cell centres that fit inside the area.
+
+    Uses floor(dim/step) + 1 so every cell centre sits at col*step <= dim,
+    guaranteeing the whole sweep stays within [0, width] x [0, depth].
+    """
+    num_cols = max(1, int(area.width_m / step_size_m) + 1)
+    num_rows = max(1, int(area.depth_m / step_size_m) + 1)
+    return num_cols, num_rows
+
+
 def generate_plan(query: str, area: SearchArea, step_size_m: float = 0.5) -> FlightPlan:
     """Generate a lawnmower sweep FlightPlan for the given SearchArea.
 
-    The plan covers every grid cell exactly once in a bidirectional row
-    (lawnmower) pattern. Always starts with TAKEOFF and ends with LAND.
+    Coordinate model (shared with the safety checker):
+      - Origin (0, 0) is a corner of the area; the drone starts there.
+      - X axis runs along columns; RIGHT = +x, LEFT = -x.
+      - Y axis runs along rows; FORWARD = +y, BACKWARD = -y.
+      - Column x positions: col * step_size_m, col in 0..num_cols-1.
+      - Row y positions: row * step_size_m, row in 0..num_rows-1.
 
-    Args:
-        query: The user's search query (stored in FlightPlan for reference).
-        area: The SearchArea dimensions in metres.
-        step_size_m: Grid cell size; defaults to 0.5 m.
-
-    Returns:
-        A FlightPlan whose moves cover the full search area.
+    Every grid cell is visited exactly once and gets exactly one HOVER.
+    The plan always starts with TAKEOFF and ends with LAND. No TURN
+    commands are emitted, so the geometry is unambiguous.
     """
     moves: list[Move] = []
-
-    # Always start with takeoff
     moves.append(Move(type=MoveType.TAKEOFF))
 
-    num_cols = max(1, math.ceil(area.width_m / step_size_m))
-    num_rows = max(1, math.ceil(area.depth_m / step_size_m))
+    num_cols, num_rows = _grid_dims(area, step_size_m)
 
     for row in range(num_rows):
-        # Determine traversal direction for this row
         left_to_right = (row % 2 == 0)
-
-        # Traverse all columns in this row
-        for col in range(num_cols):
-            # Hover at this cell to allow the camera to capture frames
+        # Hover at the first cell of the row
+        moves.append(Move(type=MoveType.HOVER, duration_s=0.5))
+        # Traverse the remaining columns in this row
+        for _col in range(num_cols - 1):
+            direction = Direction.RIGHT if left_to_right else Direction.LEFT
+            moves.append(Move(type=MoveType.MOVE, direction=direction, distance_m=step_size_m))
             moves.append(Move(type=MoveType.HOVER, duration_s=0.5))
-
-            # Move to next column (except at the last column)
-            if col < num_cols - 1:
-                direction = Direction.FORWARD if left_to_right else Direction.BACKWARD
-                moves.append(Move(
-                    type=MoveType.MOVE,
-                    direction=direction,
-                    distance_m=step_size_m,
-                ))
-
-        # At end of row: if not the last row, move to the next row
+        # Advance to the next row (except after the last row)
         if row < num_rows - 1:
-            # Turn 90° to face the next row, step across, turn 90° back
-            if left_to_right:
-                # Finished going left→right: turn right, step, turn right (now facing right→left)
-                moves.append(Move(type=MoveType.TURN, angle_deg=90.0))
-                moves.append(Move(type=MoveType.MOVE, direction=Direction.FORWARD, distance_m=step_size_m))
-                moves.append(Move(type=MoveType.TURN, angle_deg=90.0))
-            else:
-                # Finished going right→left: turn left, step, turn left (now facing left→right)
-                moves.append(Move(type=MoveType.TURN, angle_deg=-90.0))
-                moves.append(Move(type=MoveType.MOVE, direction=Direction.FORWARD, distance_m=step_size_m))
-                moves.append(Move(type=MoveType.TURN, angle_deg=-90.0))
+            moves.append(Move(type=MoveType.MOVE, direction=Direction.FORWARD, distance_m=step_size_m))
 
-    # Always end with land
     moves.append(Move(type=MoveType.LAND))
-
     return FlightPlan(moves=moves, area=area, query=query)

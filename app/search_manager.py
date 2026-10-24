@@ -202,6 +202,13 @@ class SearchManager:
         if not result.ok:
             await self._log(f"Safety check failed: {result.reason}", "error")
             self._is_searching = False
+            self._last_bbox = None
+            # Broadcast a failure result so the UI stops "Searching..."
+            # and re-enables the command box.
+            await self.broadcast(WSMessage(
+                type="result",
+                payload={"found": False, "message": f"Search could not start: {result.reason}"},
+            ))
             return
 
         # Configure vision for this query
@@ -215,6 +222,16 @@ class SearchManager:
         except asyncio.CancelledError:
             frame_task.cancel()
             raise
+        except Exception as exc:
+            # Any unexpected failure must still reset the UI.
+            await self._log(f"Search failed: {exc}", "error")
+            self._is_searching = False
+            self._last_bbox = None
+            await self.broadcast(WSMessage(
+                type="result",
+                payload={"found": False, "message": f"Search failed: {exc}"},
+            ))
+            return
         finally:
             frame_task.cancel()
             try:

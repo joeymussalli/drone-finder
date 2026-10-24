@@ -48,6 +48,33 @@ An indoor lost-item search system: type what you're looking for and a small quad
 7. Watch the status log as the simulated drone sweeps the area.
 8. Use the red **STOP** button at any time to land immediately.
 
+## Sim Demo Photos
+
+Simulation mode serves real photos from the `sim_images/` folder so the
+vision model can actually find something during a demo. Drop your own
+JPGs into `sim_images/`:
+
+1. Add **one** photo named `target.jpg` that clearly shows the item you
+   will search for (e.g. a blue water bottle on a table). This is the
+   photo the drone "sees" when it reaches the target cell.
+2. Add **one or more** other room photos with any filename (e.g.
+   `room1.jpg`, `hallway.jpg`, `desk.jpg`). These are shown while the
+   drone sweeps the rest of the area and must NOT contain the item.
+3. Supported extensions: `.jpg`, `.jpeg`, `.png`. Any file named
+   `target.*` is the target; every other image is treated as a
+   non-target room photo.
+4. Set `SIM_TARGET_CELL` in `.env` to the grid cell where the target
+   photo should appear (default `1,2`). The drone must pass through this
+   cell during the sweep for the item to be found.
+5. Search for the item by name in the UI (e.g. `blue water bottle`). The
+   detector runs against whichever photo is being served for the drone's
+   current cell.
+
+> **Note:** The repo ships with solid-colour placeholder images so the
+> server starts out of the box, but nothing can be detected in them.
+> Replace them with real photos for a working find. You need at least a
+> `target.jpg` plus one other photo.
+
 ## Running with Real Hardware
 
 1. Connect your laptop to the ESP32's Wi-Fi network (or same local network).

@@ -4,6 +4,7 @@ import time
 
 
 class Sighting:
+    # Constructor
     def __init__(self, object_label, zone_name, confidence, timestamp):
         self.object_label = object_label
         self.zone_name = zone_name
@@ -38,7 +39,7 @@ class Sighting:
         if seconds < 10:
             return "just now"
         if seconds < 60:
-            return "a few seconds ago"
+            return f"about {int(round(seconds))} seconds ago"
         minutes = seconds / 60
         if minutes < 2:
             return "about a minute ago"

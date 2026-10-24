@@ -39,6 +39,17 @@ class VisionModule:
         self._model.set_classes([query])
         self._window.clear()
 
+    def reset(self) -> None:
+        """Clear all per-search detection state.
+
+        Clears the confidence window and forces the next analyse_frame() to
+        re-apply set_classes() for whatever query is active. Call this at the
+        start and end of every search so a window primed by a previous query
+        can never carry over into the next one.
+        """
+        self._window.clear()
+        self._current_query = None
+
     def analyse_frame(self, frame: np.ndarray, query: str) -> FrameResult:
         """Run YOLO-World inference on a single frame.
 

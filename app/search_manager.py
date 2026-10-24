@@ -63,6 +63,14 @@ class SearchManager:
         self._last_frame_bytes: Optional[bytes] = None
         self._last_bbox: Optional[tuple[int, int, int, int]] = None
         self._candidate_event: Optional[CandidateFoundEvent] = None
+        # Monotonic id for the current search. Detection results and
+        # candidate events are tagged with the id active when inference was
+        # dispatched; anything stamped with a stale id is dropped. This makes
+        # a result computed for a previous query impossible to accept after
+        # the query changes (YOLO runs in a worker thread).
+        self._search_id = 0
+        self._active_search_id = 0
+        self._candidate_search_id = -1
         self._is_searching = False
         self._last_frame_time = time.monotonic()
 
@@ -202,6 +210,17 @@ class SearchManager:
     # Search lifecycle
     # ------------------------------------------------------------------
 
+    def _reset_search_state(self) -> None:
+        """Fully clear vision/search state so nothing leaks between searches."""
+        self._candidate_event = None
+        self._candidate_search_id = -1
+        self._last_bbox = None
+        self._last_frame_bytes = None
+        self._trail = []
+        self._announced_first_row = False
+        self._cell = (0, 0)
+        self._vision.reset()
+
     async def start(self, query: str) -> None:
         if self._is_searching:
             await self._log("A search is already in progress.", "error")
@@ -213,11 +232,10 @@ class SearchManager:
             return
 
         self._stop_event.clear()
+        self._search_id += 1
+        self._active_search_id = self._search_id
+        self._reset_search_state()
         self._is_searching = True
-        self._last_bbox = None
-        self._trail = []
-        self._announced_first_row = False
-        self._cell = (0, 0)
         self._search_task = asyncio.create_task(self._run_search(query))
 
     async def stop(self) -> None:
@@ -229,7 +247,10 @@ class SearchManager:
             except asyncio.CancelledError:
                 pass
         self._is_searching = False
-        self._last_bbox = None
+        # Invalidate any in-flight detection and clear all per-search state.
+        self._search_id += 1
+        self._active_search_id = self._search_id
+        self._reset_search_state()
         await self._log("Search stopped by user.")
         await self._emergency_land()
 
@@ -248,6 +269,7 @@ class SearchManager:
     # ------------------------------------------------------------------
 
     async def _run_search(self, query: str) -> None:
+        search_id = self._search_id
         await self._log(f"Search started: '{query}'")
 
         plan = generate_plan(query, self._config.search_area, self._config.step_size_m)
@@ -286,7 +308,7 @@ class SearchManager:
         ))
 
         self._vision.set_query(query)
-        frame_task = asyncio.create_task(self._frame_loop(query))
+        frame_task = asyncio.create_task(self._frame_loop(query, search_id))
 
         try:
             found = await self._execute_plan(plan, query)
@@ -323,8 +345,12 @@ class SearchManager:
             except (asyncio.TimeoutError, DroneCommandError) as exc:
                 await self._log(f"Landing failed after sweep: {exc}", "error")
 
-    async def _frame_loop(self, query: str) -> None:
-        """Continuously fetch frames and run detection."""
+    async def _frame_loop(self, query: str, search_id: int) -> None:
+        """Continuously fetch frames and run detection for one search.
+
+        Results are only honoured while *search_id* is still the active
+        search; anything computed after the query changed is dropped.
+        """
         interval = 1.0 / self.DETECTION_FPS
         last_video_ok = time.monotonic()
         hover_issued = False
@@ -353,10 +379,18 @@ class SearchManager:
             buf = np.frombuffer(raw, dtype=np.uint8)
             frame = cv2.imdecode(buf, cv2.IMREAD_COLOR)
             if frame is not None:
+                # Tell on_candidate_found which search this frame belongs to,
+                # so a candidate emitted from inside the worker thread is
+                # stamped with this id and can be rejected if the search
+                # changed while inference was running.
+                self._active_search_id = search_id
                 # YOLO inference is CPU-bound and blocking; run it in a
                 # worker thread so it does not freeze the event loop (which
                 # would starve the per-cell dwell and limit frames per cell).
                 result = await asyncio.to_thread(self._vision.analyse_frame, frame, query)
+                # Drop results for a search that is no longer current.
+                if search_id != self._search_id:
+                    return
                 if result.detected:
                     self._last_bbox = result.bbox
                     await self.broadcast(WSMessage(
@@ -395,12 +429,17 @@ class SearchManager:
 
             await asyncio.sleep(0)
 
-            if self._candidate_event is not None:
+            if (self._candidate_event is not None
+                    and self._candidate_search_id == self._search_id):
                 event = self._candidate_event
                 self._candidate_event = None
+                self._candidate_search_id = -1
                 found = await self._handle_candidate(event, query)
                 if found:
                     return True
+            else:
+                # Discard any candidate left over from a previous search.
+                self._candidate_event = None
 
         return False
 
@@ -542,5 +581,8 @@ class SearchManager:
         return f"The {query} appears in the {row_word}-{col_word} area of the room."
 
     def on_candidate_found(self, event: CandidateFoundEvent) -> None:
-        """Callback registered with VisionModule -- stores event for pickup in the plan loop."""
+        """Callback registered with VisionModule (fires inside the inference
+        worker thread). Stamp the candidate with the search id that was active
+        when the frame was dispatched so stale candidates can be rejected."""
         self._candidate_event = event
+        self._candidate_search_id = self._active_search_id

@@ -22,7 +22,7 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 
-DEFAULT_ITEMS = ["sunglasses", "boots", "camera", "backpack", "baseball glove"]
+DEFAULT_ITEMS = ["backpack", "sunglasses", "camera"]
 
 
 def ffmpeg_path():

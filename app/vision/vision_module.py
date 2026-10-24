@@ -30,6 +30,7 @@ class VisionModule:
         self._model: Optional[YOLOWorld] = None  # lazy-loaded on first set_query()
         self._current_query: Optional[str] = None
         self._window: list[tuple[FrameResult, bytes]] = []  # (result, jpeg_bytes)
+        self.threshold = CONFIDENCE_THRESHOLD
 
     def set_query(self, query: str) -> None:
         """Configure the target class. Call once per search before processing frames."""
@@ -84,7 +85,7 @@ class VisionModule:
 
         # Clamp confidence to [0.0, 1.0]
         best_conf = max(0.0, min(1.0, best_conf))
-        detected = best_conf >= CONFIDENCE_THRESHOLD
+        detected = best_conf >= getattr(self, "threshold", CONFIDENCE_THRESHOLD)
 
         result = FrameResult(
             detected=detected,

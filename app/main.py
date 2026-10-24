@@ -123,6 +123,10 @@ async def lifespan(app: FastAPI):
         llm = NullLLMAdapter()
 
     vision = VisionModule(candidate_callback=lambda event: None)
+    # YOLO-World scores real overhead photos lower than close-up product
+    # shots; the sim scene was checked cell by cell at this threshold.
+    if isinstance(video_source, SimVideoSource) and video_source.is_scene:
+        vision.threshold = 0.25
 
     manager = SearchManager(
         config=config,

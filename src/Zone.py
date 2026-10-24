@@ -1,10 +1,4 @@
-"""Zone: a named rectangular region of the camera frame.
-
-With a single fixed camera, we don't know an object's real-world (x, y, z)
-position. Instead we divide the camera image into named regions (e.g.
-"counter", "table", "floor") and report which region an object was seen in.
-A Zone is one such region, defined by pixel bounds in the frame.
-"""
+"""Zone: a named rectangular region of the camera frame."""
 
 
 class Zone:

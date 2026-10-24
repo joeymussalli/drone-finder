@@ -106,16 +106,14 @@
   <div id="search-row">
     <div id="search-bar">
       <input id="query-input" type="text" maxlength="200"
-        placeholder="What are you looking for? e.g. blue water bottle"
+        placeholder="What are you looking for? e.g. my sunglasses"
         oninput="clearValidation()" onkeydown="if(event.key==='Enter') doSearch()" />
       <button id="search-btn" onclick="doSearch()">Search</button>
     </div>
     <div id="chips">
-      <button class="chip" onclick="quickSearch('water bottle')">water bottle</button>
       <button class="chip" onclick="quickSearch('backpack')">backpack</button>
-      <button class="chip" onclick="quickSearch('cell phone')">cell phone</button>
-      <button class="chip" onclick="quickSearch('laptop')">laptop</button>
-      <button class="chip" onclick="quickSearch('coffee mug')">coffee mug</button>
+      <button class="chip" onclick="quickSearch('sunglasses')">sunglasses</button>
+      <button class="chip" onclick="quickSearch('camera')">camera</button>
     </div>
     <div id="validation-msg"></div>
   </div>

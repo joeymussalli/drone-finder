@@ -99,10 +99,10 @@ class VisionModule:
             _, jpeg_buf = cv2.imencode(".jpg", frame)
             frame_bytes = jpeg_buf.tobytes()
             self._window.append((result, frame_bytes))
-            if len(self._window) > WINDOW_SIZE:
+            if len(self._window) > getattr(self, "window_size", WINDOW_SIZE):
                 self._window.pop(0)
 
-            if len(self._window) == WINDOW_SIZE:
+            if len(self._window) >= getattr(self, "window_size", WINDOW_SIZE):
                 self._emit_candidate()
         else:
             # Reset window on any sub-threshold frame

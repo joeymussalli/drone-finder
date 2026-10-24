@@ -127,6 +127,10 @@ async def lifespan(app: FastAPI):
     # shots; the sim scene was checked cell by cell at this threshold.
     if isinstance(video_source, SimVideoSource) and video_source.is_scene:
         vision.threshold = 0.25
+        # The sim camera glides between cells, so each cell gets only a few
+        # settled frames; one solid detection is enough to start confirming.
+        vision.window_size = 1
+        print("[INFO] Sim scene: detection threshold 0.25, window 1", file=sys.stderr)
 
     manager = SearchManager(
         config=config,

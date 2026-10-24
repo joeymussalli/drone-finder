@@ -9,11 +9,11 @@ class Zone:
         self.x_max, self.y_max = x_max, y_max # Bottom Right corner of rectangular region
 
     # Returns Boolean. True if point is within boundaries. False Otherwise
-    def contains_point(self, x, y):
+    def contains_point(self, x, y) -> bool:
         return (self.x_min <= x <= self.x_max) and (self.y_min <= y <= self.y_max)
 
     # Returns Boolean. True if rectangle is within boundaries, with a focus on the center point. False Otherwise
-    def contains_box(self, x_min, y_min, x_max, y_max):
+    def contains_box(self, x_min, y_min, x_max, y_max) -> bool:
         x_center = (x_min + x_max) / 2
         y_center = (y_min + y_max) / 2
         return self.contains_point(x_center, y_center)

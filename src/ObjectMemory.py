@@ -5,32 +5,32 @@ from src.Sighting import Sighting
 class ObjectMemory:
     # Constructor
     def __init__(self):
-        self.memory = dict();
+        self.memory: dict[str, list[Sighting]] = dict()
 
     # Store a new sighting under its object label.
-    def record(self, sighting):
-        if (sighting.object_label not in self.memory):
+    def record(self, sighting: Sighting):
+        if sighting.object_label not in self.memory:
             self.memory[sighting.object_label] = []
         self.memory[sighting.object_label].append(sighting)
 
     # Return the most recent sighting for an object, or None.
-    def latest(self, object_label):
-        if (object_label not in self.memory):
+    def latest(self, object_label: str) -> Sighting | None:
+        if object_label not in self.memory:
             return None
-        return self.memory[object_label][-1]   # last element is the newest
+        return self.memory[object_label][-1]
 
     # Return the full list of sightings for an object (oldest first).
-    def history(self, object_label):
-        if (object_label not in self.memory):
+    def history(self, object_label: str) -> list[Sighting]:
+        if object_label not in self.memory:
             return []
         return self.memory[object_label]
 
     # Return the set/list of object labels we have ever recorded.
-    def all_objects(self):
+    def all_objects(self) -> list[str]:
         return list(self.memory.keys())
 
     # Return the sighting we most TRUST right now, or None if none clear the bar.
-    def best(self, object_label, now=None, min_trust=0.25):
+    def best(self, object_label: str, now: float | None = None, min_trust: float = 0.25) -> Sighting | None:
         most_trusted = None
         most_trusted_score = 0.0
         for sighting in self.history(object_label):
@@ -41,8 +41,8 @@ class ObjectMemory:
         return most_trusted
 
     # Produce a plain-language answer to "where is my <object_label>?".
-    def answer(self, object_label, now=None, min_trust=0.25):
+    def answer(self, object_label: str, now: float | None = None, min_trust: float = 0.25) -> str:
         sighting = self.best(object_label, now, min_trust)
-        if (sighting == None):
+        if sighting == None:
             return f"I'm sorry, I haven't seen your {object_label} recently."
         return sighting.describe(now)

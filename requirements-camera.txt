@@ -1,0 +1,3 @@
+opencv-python==5.0.0.93
+ultralytics==8.4.187
+clip @ git+https://github.com/ultralytics/CLIP.git@7ffa84b3bfa40c42ecc1c77147a855e69cb2dd40

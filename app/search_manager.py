@@ -179,6 +179,14 @@ class SearchManager:
         # Live camera while idle: show what the camera sees right now.
         if self._live_camera and not self._is_searching:
             return self._video_source.get_frame(self._cell)
+        # Sim scene: render the moving camera at display rate so pans are
+        # smooth. Only draw the detection box once the camera has stopped,
+        # so the box always lines up with what is on screen.
+        if self._sim_mode and self._video_source.is_scene:
+            frame_bytes = self._video_source.render_current()
+            if self._last_bbox is not None and self._video_source.camera_settled:
+                return self._draw_box_on(frame_bytes, self._last_bbox)
+            return frame_bytes
         if self._last_frame_bytes is None:
             return None
         if self._last_bbox is not None:
@@ -285,6 +293,9 @@ class SearchManager:
         target_cell = None
         if self._sim_mode:
             try:
+                if self._video_source.is_scene:
+                    self._video_source.set_grid(self._cols, self._rows)
+                    self._video_source.takeoff()
                 self._video_source.set_query(query)
                 cell = self._video_source.active_target_cell
                 target_cell = list(cell) if cell is not None else None

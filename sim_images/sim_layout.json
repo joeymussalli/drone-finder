@@ -1,11 +1,130 @@
 {
-  "comment": "Maps each searchable item to its photo and a fixed grid cell [col,row]. Grid is 7x7 for the default 3x3 m area at 0.5 m step (cols/rows 0-6). Items are placed in rows 3-6 so every search runs well into the sweep before the find. The item photo is served only when the drone is on its cell AND the active query matches one of the item aliases; all other cells show a plain room photo.",
-  "items": [
-    { "name": "water bottle", "file": "item_water_bottle.jpg", "cell": [1, 3], "aliases": ["water bottle", "bottle", "water", "flask"] },
-    { "name": "backpack",     "file": "item_backpack.jpg",     "cell": [5, 3], "aliases": ["backpack", "bag", "rucksack", "knapsack"] },
-    { "name": "coffee mug",   "file": "item_coffee_mug.jpg",   "cell": [3, 4], "aliases": ["coffee mug", "mug", "cup", "coffee", "coffee cup"] },
-    { "name": "laptop",       "file": "item_laptop.jpg",       "cell": [1, 6], "aliases": ["laptop", "computer", "notebook computer"] },
-    { "name": "cell phone",   "file": "item_cell_phone.jpg",   "cell": [5, 6], "aliases": ["cell phone", "phone", "smartphone", "mobile", "mobile phone"] }
+  "comment": "Scene mode: one real overhead photo of a floor. The sim camera glides over it cell by cell on a grid x grid layout. Items list the objects that are really in the photo, with the cell [col,row] they sit in (used only for the map's target hint); detection always runs on the actual camera view.",
+  "scene": "scene_floor.jpg",
+  "grid": [
+    7,
+    7
   ],
-  "plain": ["plain_room_1.jpg", "plain_room_2.jpg", "plain_room_3.jpg"]
+  "items": [
+    {
+      "name": "sunglasses",
+      "cell": [
+        1,
+        3
+      ],
+      "aliases": [
+        "sunglasses",
+        "glasses",
+        "shades",
+        "ray-bans"
+      ]
+    },
+    {
+      "name": "backpack",
+      "cell": [
+        3,
+        4
+      ],
+      "aliases": [
+        "backpack",
+        "bag",
+        "rucksack",
+        "knapsack"
+      ]
+    },
+    {
+      "name": "boots",
+      "cell": [
+        5,
+        3
+      ],
+      "aliases": [
+        "boots",
+        "boot",
+        "shoes",
+        "shoe"
+      ]
+    },
+    {
+      "name": "camera",
+      "cell": [
+        5,
+        4
+      ],
+      "aliases": [
+        "camera",
+        "film camera",
+        "pentax"
+      ]
+    },
+    {
+      "name": "baseball glove",
+      "cell": [
+        1,
+        4
+      ],
+      "aliases": [
+        "baseball glove",
+        "glove",
+        "mitt",
+        "baseball mitt"
+      ]
+    },
+    {
+      "name": "jacket",
+      "cell": [
+        1,
+        1
+      ],
+      "aliases": [
+        "jacket",
+        "shirt",
+        "coat"
+      ]
+    },
+    {
+      "name": "flask",
+      "cell": [
+        2,
+        5
+      ],
+      "aliases": [
+        "flask",
+        "hip flask"
+      ]
+    },
+    {
+      "name": "rope",
+      "cell": [
+        2,
+        3
+      ],
+      "aliases": [
+        "rope",
+        "cord"
+      ]
+    },
+    {
+      "name": "pocket knife",
+      "cell": [
+        5,
+        3
+      ],
+      "aliases": [
+        "pocket knife",
+        "knife",
+        "swiss army knife"
+      ]
+    },
+    {
+      "name": "wallet",
+      "cell": [
+        1,
+        3
+      ],
+      "aliases": [
+        "wallet"
+      ]
+    }
+  ]
 }

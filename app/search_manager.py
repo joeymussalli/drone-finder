@@ -512,3 +512,29 @@ class SearchManager:
         ))
         return True
 
+    def _draw_box_on(self, jpeg_bytes: bytes, bbox) -> bytes:
+        """Return the JPEG with the detection bounding box drawn, if any."""
+        if not bbox:
+            return jpeg_bytes
+        try:
+            arr = np.frombuffer(jpeg_bytes, dtype=np.uint8)
+            frame = cv2.imdecode(arr, cv2.IMREAD_COLOR)
+            if frame is None:
+                return jpeg_bytes
+            x, y, w, h = bbox
+            cv2.rectangle(frame, (int(x), int(y)), (int(x + w), int(y + h)), (0, 255, 0), 3)
+            ok, enc = cv2.imencode(".jpg", frame)
+            return enc.tobytes() if ok else jpeg_bytes
+        except Exception:
+            return jpeg_bytes
+
+    def _fallback_location_sentence(self, query: str) -> str:
+        """A sensible human-readable location when the LLM is unavailable."""
+        col, row = self._cell
+        col_word = "left" if col < self._cols / 3 else ("right" if col > 2 * self._cols / 3 else "centre")
+        row_word = "front" if row < self._rows / 3 else ("back" if row > 2 * self._rows / 3 else "middle")
+        return f"The {query} appears in the {row_word}-{col_word} area of the room."
+
+    def on_candidate_found(self, event: CandidateFoundEvent) -> None:
+        """Callback registered with VisionModule -- stores event for pickup in the plan loop."""
+        self._candidate_event = event
